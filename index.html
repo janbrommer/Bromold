@@ -515,6 +515,109 @@ h3 { font-size: 1.1rem; color: var(--primary); margin-bottom: 8px; font-weight: 
 .mass-card-selectable .mass-title { font-weight: 600; margin-bottom: 8px; font-size: 0.95rem; }
 .mass-card-selectable .mass-format { margin-bottom: 8px; }
 .mass-card-selectable.advancing { pointer-events: none; }
+.mass-card-selectable.disabled {
+  opacity: 0.45;
+  pointer-events: none;
+  cursor: not-allowed;
+  border-color: var(--border);
+  background: #f8f8f8;
+}
+.mass-card-selectable.disabled:hover {
+  transform: none;
+  box-shadow: var(--shadow-card);
+  border-color: var(--border);
+}
+
+/* Time badge on cards */
+.time-badge {
+  display: inline-block;
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 20px;
+  background: rgba(46,64,87,0.08);
+  color: var(--primary);
+  margin-left: 8px;
+  vertical-align: middle;
+}
+
+/* Time budget bar */
+.time-budget-header {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px 20px;
+  margin-bottom: 20px;
+  box-shadow: var(--shadow-card);
+}
+.time-budget-bar {
+  width: 100%;
+  height: 10px;
+  background: #e9ecef;
+  border-radius: 5px;
+  overflow: hidden;
+  margin: 10px 0 8px;
+}
+.time-budget-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary), var(--accent));
+  border-radius: 5px;
+  transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.time-budget-fill.over {
+  background: linear-gradient(90deg, var(--red), #e53935);
+}
+.time-budget-text {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+/* Section dividers for hoch/moderat */
+.section-divider {
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 12px 0 8px;
+  margin-top: 8px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.section-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+.section-divider-red { color: var(--red); }
+.section-divider-yellow { color: var(--yellow); }
+
+/* Cluster sub-header in selection */
+.select-cluster-header {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--primary);
+  margin: 16px 0 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.select-cluster-header .ampel-badge { font-size: 0.72rem; }
+.select-cluster-header .cluster-score { font-weight: 400; color: var(--text-muted); font-size: 0.85rem; }
+
+/* Disabled tooltip */
+.disabled-hint {
+  display: block;
+  font-size: 0.78rem;
+  color: var(--red);
+  font-weight: 500;
+  margin-top: 6px;
+  font-style: italic;
+}
 
 /* ============================================
    FOOTER
@@ -731,8 +834,8 @@ const ITEMS = [
 const CLUSTERS = [
   { id: 1, name: "Achtsamkeit & Meditation",              items: [3,7,16,23,26,31,40], greenMin: 3.50, redBelow: 2.50 },
   { id: 2, name: "Stressmanagement & Entspannung",        items: [6,12,15,19,28,32,38], greenMin: 4.00, redBelow: 3.00 },
-  { id: 3, name: "Verhaltenstherapeutische Ansätze",       items: [2,11,18,20,25,34,41], greenMin: 3.50, redBelow: 2.50 },
-  { id: 4, name: "Körperliche Aktivität & Wohlbefinden",   items: [5,9,14,24,30,33,37], greenMin: 3.50, redBelow: 2.50 },
+  { id: 3, name: "Gewohnheiten & Denkweisen",       items: [2,11,18,20,25,34,41], greenMin: 3.50, redBelow: 2.50 },
+  { id: 4, name: "Bewegung & körperliches Wohlbefinden & Wohlbefinden",   items: [5,9,14,24,30,33,37], greenMin: 3.50, redBelow: 2.50 },
   { id: 5, name: "Selbstmanagement & Problemlösung",       items: [1,8,17,22,27,35,39], greenMin: 4.00, redBelow: 3.00 },
   { id: 6, name: "Emotionale & Positive Kompetenzen",      items: [4,10,13,21,29,36,42], greenMin: 3.50, redBelow: 2.50 }
 ];
@@ -759,62 +862,62 @@ const TAG_LABELS = {
 
 const MASSNAHMEN = {
   1: [
-    { title: "Betriebliche Achtsamkeitstrainings", format: "Mixed / In-person",
+    { title: "Betriebliche Achtsamkeitstrainings", format: "Mixed / In-person", maxMin: 150,
       desc: "Präsenzbasierte Gruppentrainings mit Achtsamkeitsübungen, Body-Scans und Meditation im betrieblichen Umfeld.",
       tags: [{t:"RAUM",r:true},{t:"TR_EXT",r:true},{t:"BOOSTER",r:false},{t:"VERTR.",r:true}] },
-    { title: "Achtsamkeitsbasierte Stressreduktion (MBSR)", format: "Mixed",
+    { title: "Achtsamkeitsbasierte Stressreduktion (MBSR)", format: "Mixed", maxMin: 120,
       desc: "8-wöchiges strukturiertes Programm zur Stressreduktion durch Achtsamkeit nach Jon Kabat-Zinn.",
       tags: [{t:"BOOSTER",r:false},{t:"VERTR.",r:true}] },
-    { title: "Digitale Achtsamkeits- & Meditationsprogramme", format: "Online",
+    { title: "Digitale Achtsamkeits- & Meditationsprogramme", format: "Online", maxMin: 40,
       desc: "Selbstgesteuertes Online-Training mit geführten Meditationen, Videos und App-gestützten Übungen.",
       tags: [{t:"LMS",r:true},{t:"VIDEO",r:false},{t:"ECOACH",r:false},{t:"APP",r:false},{t:"BOOSTER",r:false},{t:"VERTR.",r:true}] },
-    { title: "Achtsamkeits-Kurzinterventionen", format: "Mixed",
+    { title: "Achtsamkeits-Kurzinterventionen", format: "Mixed", maxMin: 60,
       desc: "Kompakte Einheiten (ca. 10–15 Min.), integrierbar in den Arbeitsalltag.",
       tags: [{t:"RAUM",r:true},{t:"TR_EXT",r:true},{t:"BOOSTER",r:false},{t:"VERTR.",r:true}] }
   ],
   2: [
-    { title: "Digitale Stressmanagement-Programme", format: "Online",
+    { title: "Digitale Stressmanagement-Programme", format: "Online", maxMin: 60,
       desc: "Online-Training zur Stressbewältigung mit Selbstlernmodulen und optionaler App-Begleitung.",
       tags: [{t:"LMS",r:true},{t:"VIDEO",r:false},{t:"APP",r:false},{t:"BOOSTER",r:false},{t:"VERTR.",r:true}] },
-    { title: "Entspannungsinterventionen", format: "Mixed",
+    { title: "Entspannungsinterventionen", format: "Mixed", maxMin: 30,
       desc: "Progressive Muskelrelaxation, Autogenes Training oder ähnliche Techniken in Gruppenform.",
       tags: [{t:"RAUM",r:true},{t:"TR_EXT",r:true},{t:"BOOSTER",r:false},{t:"VERTR.",r:true}] },
-    { title: "Stressmanagement-Kurzinterventionen", format: "Mixed",
+    { title: "Stressmanagement-Kurzinterventionen", format: "Mixed", maxMin: 60,
       desc: "Kompakte Module, niederschwellig in den Arbeitsalltag integrierbar.",
       tags: [{t:"BOOSTER",r:false},{t:"VERTR.",r:true}] },
-    { title: "VR-gestützte Entspannung", format: "In-person",
+    { title: "VR-gestützte Entspannung", format: "In-person", maxMin: 15,
       desc: "Entspannungstraining in Virtual-Reality-Umgebungen mit immersiven Naturszenarien.",
       tags: [{t:"RAUM",r:true},{t:"TR_EXT",r:true},{t:"VIDEO",r:true},{t:"VERTR.",r:true}] }
   ],
   3: [
-    { title: "KVT-basierte digitale Programme", format: "Online",
+    { title: "KVT-basierte digitale Programme", format: "Online", maxMin: 60,
       desc: "Kognitive Verhaltenstherapie als Online-Selbsthilfe zur Veränderung dysfunktionaler Denkmuster.",
       tags: [{t:"LMS",r:true},{t:"VIDEO",r:false},{t:"ECOACH",r:false},{t:"APP",r:false},{t:"BOOSTER",r:false},{t:"VERTR.",r:true}] },
-    { title: "ACT-basierte Online-Interventionen", format: "Online",
+    { title: "ACT-basierte Online-Interventionen", format: "Online", maxMin: 75,
       desc: "Akzeptanz- und Commitment-Übungen zur Förderung psychologischer Flexibilität.",
       tags: [{t:"LMS",r:true},{t:"VIDEO",r:false},{t:"ECOACH",r:false},{t:"APP",r:false},{t:"BOOSTER",r:false},{t:"VERTR.",r:true}] }
   ],
   4: [
-    { title: "Betriebliche Bewegungsprogramme", format: "In-person Gruppe",
+    { title: "Betriebliche Bewegungsprogramme", format: "In-person Gruppe", maxMin: 90,
       desc: "Regelmässige Gruppenaktivitäten wie Laufgruppen, Firmenfitness oder aktive Pausen.",
       tags: [{t:"RAUM",r:true},{t:"TR_EXT",r:true},{t:"APP",r:false},{t:"BOOSTER",r:false},{t:"VERTR.",r:true}] },
-    { title: "Yoga-basierte Stressreduktion", format: "In-person Gruppe",
+    { title: "Yoga-basierte Stressreduktion", format: "In-person Gruppe", maxMin: 60,
       desc: "Yoga-Einheiten mit Körperübungen, Atemtechniken und Entspannung.",
       tags: [{t:"RAUM",r:true},{t:"TR_EXT",r:true},{t:"VIDEO",r:false},{t:"APP",r:false},{t:"BOOSTER",r:false},{t:"VERTR.",r:true}] },
-    { title: "Kompensatorische Bewegungsprogramme", format: "In-person Gruppe",
+    { title: "Kompensatorische Bewegungsprogramme", format: "In-person Gruppe", maxMin: 30,
       desc: "Gezielte Übungen zum Ausgleich einseitiger Arbeitsbelastungen (z.B. langes Sitzen).",
       tags: [{t:"RAUM",r:true},{t:"TR_EXT",r:true},{t:"APP",r:false},{t:"BOOSTER",r:false},{t:"VERTR.",r:true}] }
   ],
   5: [
-    { title: "Digitale Selbsthilfe-Programme", format: "Online",
+    { title: "Digitale Selbsthilfe-Programme", format: "Online", maxMin: 60,
       desc: "Online-Module zur Stärkung von Selbstmanagement und persönlicher Zielorientierung.",
       tags: [{t:"LMS",r:true},{t:"VIDEO",r:false},{t:"APP",r:false},{t:"BOOSTER",r:false},{t:"VERTR.",r:true}] },
-    { title: "Internetbasiertes Problemlösetraining", format: "Online",
+    { title: "Internetbasiertes Problemlösetraining", format: "Online", maxMin: 60,
       desc: "Strukturiertes Online-Training zur systematischen Lösung beruflicher Herausforderungen.",
       tags: [{t:"LMS",r:true},{t:"VIDEO",r:false},{t:"ECOACH",r:false},{t:"APP",r:false},{t:"BOOSTER",r:false},{t:"VERTR.",r:true}] }
   ],
   6: [
-    { title: "Positive Psychologie-Kurzinterventionen", format: "Online",
+    { title: "Positive Psychologie-Kurzinterventionen", format: "Online", maxMin: 15,
       desc: "Übungen zur Förderung positiver Emotionen, Dankbarkeit und Stärkenorientierung.",
       tags: [{t:"LMS",r:true},{t:"VIDEO",r:false},{t:"APP",r:false},{t:"BOOSTER",r:false},{t:"VERTR.",r:true}] }
   ]
@@ -832,8 +935,9 @@ let advancing = false;
 
 // Massnahmen-Auswahl State
 let selectedMassnahmen = {};  // { clusterId: massnahmenIndex }
-let selectClusters = [];       // Top-2 Bedarfs-Cluster
-let selectStep = 0;            // 0 = Prio 1, 1 = Prio 2
+let selectClusters = [];       // All Bedarfs-Cluster (red + yellow)
+let timeUsed = 0;
+let maxMinPerWeek = 120;
 
 // ═══════════════════════════════════════════════════════════════
 // ADMIN CONFIG (localStorage)
@@ -851,6 +955,17 @@ function getActiveMassnahmen(clusterId) {
     }
   } catch (e) { /* fallback: all active */ }
   return all;
+}
+
+function getMaxMinPerWeek() {
+  try {
+    const raw = localStorage.getItem('bromold_config');
+    if (raw) {
+      const cfg = JSON.parse(raw);
+      if (cfg.maxMinPerWeek !== undefined) return cfg.maxMinPerWeek;
+    }
+  } catch (e) { /* fallback */ }
+  return 120;
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -1180,78 +1295,122 @@ function showMassnahmenSelect() {
     return;
   }
 
-  // Take top 2 (or 1 if only 1 exists)
-  selectClusters = needClusters.slice(0, 2);
-  selectedMassnahmen = {};
-  selectStep = 0;
-
-  // Filter out clusters with no active measures; auto-select if only 1
-  selectClusters = selectClusters.filter(s => getActiveMassnahmen(s.id).length > 0);
+  // Filter out clusters with no active measures
+  selectClusters = needClusters.filter(s => getActiveMassnahmen(s.id).length > 0);
   if (selectClusters.length === 0) {
     container.innerHTML = '<div class="no-measures">Alle Cluster liegen im grünen Bereich. Kein spezifisches Training erforderlich – weiter so!</div>';
     renderSummaryRadar(computeScores());
     showScreen('screen-massnahmen');
     return;
   }
-  selectClusters.forEach((s, idx) => {
-    const measures = getActiveMassnahmen(s.id);
-    if (measures.length === 1) {
-      selectedMassnahmen[s.id] = 0;
-    }
-  });
 
-  // Find first step that needs user input
-  while (selectStep < selectClusters.length && selectedMassnahmen[selectClusters[selectStep].id] !== undefined) {
-    selectStep++;
-  }
+  selectedMassnahmen = {};
+  timeUsed = 0;
+  maxMinPerWeek = getMaxMinPerWeek();
 
-  // If all auto-selected, go straight to summary
-  if (selectStep >= selectClusters.length) {
-    showMassnahmenSummary();
-    return;
-  }
-
-  renderSelectStep();
+  renderSelectScreen();
   showScreen('screen-select');
 }
 
-function prevSelectStep() {
-  if (selectStep === 0) {
-    showScreen('screen-results');
-  } else {
-    selectStep--;
-    renderSelectStep();
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+function computeTimeUsed() {
+  let total = 0;
+  for (const clusterId in selectedMassnahmen) {
+    const measures = getActiveMassnahmen(parseInt(clusterId));
+    const m = measures[selectedMassnahmen[clusterId]];
+    if (m) total += m.maxMin;
   }
+  return total;
 }
 
-function renderSelectStep() {
-  const cluster = selectClusters[selectStep];
-  const measures = getActiveMassnahmen(cluster.id);
-  const badgeClass = cluster.level === 'red' ? 'ampel-red' : 'ampel-yellow';
-  const badgeText = cluster.level === 'red' ? 'Hoher Bedarf' : 'Moderater Bedarf';
-  const prioNr = selectStep + 1;
-  const pct = ((selectStep + 1) / selectClusters.length) * 100;
+function getSelectedCount() {
+  return Object.keys(selectedMassnahmen).length;
+}
+
+function renderSelectScreen() {
+  timeUsed = computeTimeUsed();
+  const remaining = maxMinPerWeek - timeUsed;
+  const count = getSelectedCount();
+  const pct = Math.min((timeUsed / maxMinPerWeek) * 100, 100);
+
+  const redClusters = selectClusters.filter(s => s.level === 'red');
+  const yellowClusters = selectClusters.filter(s => s.level === 'yellow');
   const tagLegendItems = Object.entries(TAG_LABELS).map(([k,v]) => `${k} = ${v}`).join(', ');
 
   const container = document.getElementById('select-content');
   container.innerHTML = `
-    <div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>
-    <div class="page-indicator">Schritt ${selectStep + 1} von ${selectClusters.length}</div>
     <div class="select-header">
-      <span class="prio-label">Priorität ${prioNr} von ${selectClusters.length}</span>
-      <h2>${cluster.name}</h2>
-      <span class="ampel-badge ${badgeClass}">${badgeText}</span>
-      <span style="margin-left:8px; color:var(--text-muted); font-size:0.9rem;">(Score: ${cluster.score.toFixed(2)})</span>
-      <p class="select-hint">Wählen Sie eine Massnahme für diesen Bereich:</p>
+      <h2>Massnahmen auswählen</h2>
+      <p class="select-hint">Wählen Sie 1–3 Massnahmen innerhalb Ihres Zeitbudgets. Pro Cluster max. 1 Massnahme.</p>
     </div>
-    <div id="select-cards">
-      ${measures.map((m, idx) => `
-        <div class="mass-card-selectable" onclick="selectMassnahme(${cluster.id}, ${idx}, this)"
-             role="button" tabindex="0" aria-label="Massnahme: ${m.title}"
-             onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();selectMassnahme(${cluster.id}, ${idx}, this)}"
-             id="sel-card-${idx}">
-          <div class="mass-title">${m.title}</div>
+
+    <div class="time-budget-header">
+      <div class="time-budget-text">
+        <span>Verbraucht: ${timeUsed} von ${maxMinPerWeek} min</span>
+        <span>${remaining >= 0 ? remaining : 0} min verbleibend</span>
+      </div>
+      <div class="time-budget-bar">
+        <div class="time-budget-fill${pct > 100 ? ' over' : ''}" style="width:${Math.min(pct, 100)}%"></div>
+      </div>
+      <div class="time-budget-text">
+        <span>${count} von 3 Massnahmen gewählt</span>
+        <span>${maxMinPerWeek} min/Woche Budget</span>
+      </div>
+    </div>
+
+    ${redClusters.length > 0 ? `
+      <div class="section-divider section-divider-red">Hoher Bedarf</div>
+      ${redClusters.map(s => renderClusterSelectGroup(s, remaining, count)).join('')}
+    ` : ''}
+
+    ${yellowClusters.length > 0 ? `
+      <div class="section-divider section-divider-yellow">Moderater Bedarf</div>
+      ${yellowClusters.map(s => renderClusterSelectGroup(s, remaining, count)).join('')}
+    ` : ''}
+
+    <div class="btn-group">
+      <button class="btn btn-secondary" onclick="showScreen('screen-results')">Zurück</button>
+      <button class="btn btn-primary" id="btn-select-next" onclick="showMassnahmenSummary()"
+              ${count < 1 ? 'disabled style="opacity:0.5;pointer-events:none;"' : ''}>Weiter</button>
+    </div>
+
+    <div class="tag-legend">
+      <strong>Legende:</strong> ● = erforderlich, ○ = optional — ${tagLegendItems}
+    </div>
+  `;
+}
+
+function renderClusterSelectGroup(cluster, remaining, count) {
+  const measures = getActiveMassnahmen(cluster.id);
+  const badgeClass = cluster.level === 'red' ? 'ampel-red' : 'ampel-yellow';
+  const badgeText = cluster.level === 'red' ? 'Hoher Bedarf' : 'Moderater Bedarf';
+  const selectedIdx = selectedMassnahmen[cluster.id];
+  const hasSelection = selectedIdx !== undefined;
+
+  return `
+    <div class="select-cluster-header">
+      <span class="ampel-badge ${badgeClass}">${badgeText}</span>
+      ${cluster.name}
+      <span class="cluster-score">(Score: ${cluster.score.toFixed(2)})</span>
+    </div>
+    ${measures.map((m, idx) => {
+      const isSelected = selectedIdx === idx;
+      const wouldExceed = !isSelected && m.maxMin > remaining;
+      const maxReached = !isSelected && count >= 3;
+      const clusterTaken = !isSelected && hasSelection;
+      const isDisabled = wouldExceed || maxReached || clusterTaken;
+
+      let disabledReason = '';
+      if (wouldExceed) disabledReason = 'Zeitbudget überschritten';
+      else if (maxReached) disabledReason = 'Maximum von 3 Massnahmen erreicht';
+      else if (clusterTaken) disabledReason = 'Bereits eine Massnahme in diesem Cluster gewählt';
+
+      return `
+        <div class="mass-card-selectable${isSelected ? ' selected' : ''}${isDisabled ? ' disabled' : ''}"
+             onclick="${isDisabled ? '' : `toggleMassnahme(${cluster.id}, ${idx})`}"
+             role="button" tabindex="${isDisabled ? -1 : 0}" aria-label="Massnahme: ${m.title}"
+             ${!isDisabled ? `onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleMassnahme(${cluster.id}, ${idx})}"` : ''}
+             title="${isDisabled ? disabledReason : ''}">
+          <div class="mass-title">${m.title}<span class="time-badge">${m.maxMin} min/Wo.</span></div>
           ${m.desc ? `<p class="mass-desc">${m.desc}</p>` : ''}
           <span class="mass-format ${getFormatClass(m.format)}">${m.format}</span>
           <div class="tags">
@@ -1261,52 +1420,44 @@ function renderSelectStep() {
               </span>`
             ).join('')}
           </div>
+          ${isDisabled && disabledReason ? `<span class="disabled-hint">${disabledReason}</span>` : ''}
         </div>
-      `).join('')}
-    </div>
-    <div class="btn-group">
-      <button class="btn btn-secondary" onclick="prevSelectStep()">Zurück</button>
-    </div>
-    <div class="tag-legend">
-      <strong>Legende:</strong> ● = erforderlich, ○ = optional — ${tagLegendItems}
-    </div>
+      `;
+    }).join('')}
   `;
 }
 
-function selectMassnahme(clusterId, index, card) {
-  if (advancing) return;
-  selectedMassnahmen[clusterId] = index;
-
-  // Visual feedback
-  document.querySelectorAll('#select-cards .mass-card-selectable').forEach(c => c.classList.remove('selected'));
-  card.classList.add('selected');
-  card.classList.add('advancing');
-
-  // Auto-advance after delay
-  advancing = true;
-  setTimeout(() => {
-    advancing = false;
-    // Find next step that needs input
-    let nextStep = selectStep + 1;
-    while (nextStep < selectClusters.length && selectedMassnahmen[selectClusters[nextStep].id] !== undefined) {
-      nextStep++;
-    }
-
-    if (nextStep < selectClusters.length) {
-      selectStep = nextStep;
-      renderSelectStep();
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    } else {
-      showMassnahmenSummary();
-    }
-  }, 400);
+function toggleMassnahme(clusterId, index) {
+  if (selectedMassnahmen[clusterId] === index) {
+    // Deselect
+    delete selectedMassnahmen[clusterId];
+  } else {
+    // Select (replace if cluster already has selection)
+    selectedMassnahmen[clusterId] = index;
+  }
+  renderSelectScreen();
 }
 
 function showMassnahmenSummary() {
   const container = document.getElementById('massnahmen-container');
   const tagLegendItems = Object.entries(TAG_LABELS).map(([k,v]) => `${k} = ${v}`).join(', ');
+  const totalTime = computeTimeUsed();
 
-  container.innerHTML = selectClusters.map((s, idx) => {
+  // Build ordered list: red clusters first (by score asc), then yellow
+  const chosenClusters = selectClusters
+    .filter(s => selectedMassnahmen[s.id] !== undefined)
+    .sort((a, b) => {
+      if (a.level === 'red' && b.level !== 'red') return -1;
+      if (a.level !== 'red' && b.level === 'red') return 1;
+      return a.score - b.score;
+    });
+
+  container.innerHTML = `
+    <div style="background:var(--bg); border-radius:var(--radius-sm); padding:12px 16px; margin-bottom:16px; font-size:0.9rem; color:var(--text-muted);">
+      <strong>${chosenClusters.length} Massnahme${chosenClusters.length !== 1 ? 'n' : ''}</strong> gewählt –
+      Gesamtaufwand: <strong>${totalTime} min/Woche</strong> von ${maxMinPerWeek} min Budget
+    </div>
+  ` + chosenClusters.map((s, idx) => {
     const badgeClass = s.level === 'red' ? 'ampel-red' : 'ampel-yellow';
     const badgeText = s.level === 'red' ? 'Hoher Bedarf' : 'Moderater Bedarf';
     const measures = getActiveMassnahmen(s.id);
@@ -1323,7 +1474,7 @@ function showMassnahmenSummary() {
         </div>
         <div class="cluster-body open">
           <div class="mass-card">
-            <div class="mass-title">${m.title}</div>
+            <div class="mass-title">${m.title}<span class="time-badge">${m.maxMin} min/Wo.</span></div>
             ${m.desc ? `<p class="mass-desc">${m.desc}</p>` : ''}
             <span class="mass-format ${getFormatClass(m.format)}">${m.format}</span>
             <div class="tags">
@@ -1369,7 +1520,7 @@ function resetApp() {
   advancing = false;
   selectedMassnahmen = {};
   selectClusters = [];
-  selectStep = 0;
+  timeUsed = 0;
   if (radarChart) { radarChart.destroy(); radarChart = null; }
   if (summaryRadarChart) { summaryRadarChart.destroy(); summaryRadarChart = null; }
   showScreen('screen-welcome');

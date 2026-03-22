@@ -265,6 +265,63 @@ body {
   transform: translateX(22px);
 }
 
+/* Time badge */
+.time-badge {
+  display: inline-block;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 4px;
+  background: rgba(46,64,87,0.08);
+  color: var(--primary);
+  margin-left: 8px;
+}
+
+/* Zeitbudget section */
+.budget-section {
+  margin-bottom: 24px;
+  padding: 20px;
+  background: var(--bg);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+}
+.budget-section h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--primary);
+  margin-bottom: 12px;
+}
+.budget-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+.budget-row label {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--text);
+}
+.budget-row input[type="number"] {
+  width: 90px;
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-family: 'Inter', sans-serif;
+  font-size: 0.9rem;
+  text-align: center;
+}
+.budget-row input[type="number"]:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(92,122,234,0.15);
+}
+.budget-display {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
 /* Status toast */
 .toast {
   position: fixed;
@@ -304,6 +361,16 @@ body {
       <a href="index.html" class="back-link">&larr; Zur Bedarfserhebung</a>
     </div>
 
+    <div class="budget-section">
+      <h3>Zeitbudget</h3>
+      <div class="budget-row">
+        <label for="budget-input">Max. verfügbare Zeit pro Woche:</label>
+        <input type="number" id="budget-input" min="30" max="300" step="15" value="120"
+               onchange="updateBudget(this.value)" oninput="updateBudgetDisplay(this.value)">
+        <span class="budget-display" id="budget-display">2 h 0 min</span>
+      </div>
+    </div>
+
     <div id="clusters-container"></div>
   </div>
 </div>
@@ -318,40 +385,40 @@ body {
 const CLUSTERS = [
   { id: 1, name: "Achtsamkeit & Meditation" },
   { id: 2, name: "Stressmanagement & Entspannung" },
-  { id: 3, name: "Verhaltenstherapeutische Ansätze" },
-  { id: 4, name: "Körperliche Aktivität & Wohlbefinden" },
+  { id: 3, name: "Gewohnheiten & Denkweisen" },
+  { id: 4, name: "Bewegung & körperliches Wohlbefinden & Wohlbefinden" },
   { id: 5, name: "Selbstmanagement & Problemlösung" },
   { id: 6, name: "Emotionale & Positive Kompetenzen" }
 ];
 
 const MASSNAHMEN = {
   1: [
-    { title: "Betriebliche Achtsamkeitstrainings", format: "Mixed / In-person" },
-    { title: "Achtsamkeitsbasierte Stressreduktion (MBSR)", format: "Mixed" },
-    { title: "Digitale Achtsamkeits- & Meditationsprogramme", format: "Online" },
-    { title: "Achtsamkeits-Kurzinterventionen", format: "Mixed" }
+    { title: "Betriebliche Achtsamkeitstrainings", format: "Mixed / In-person", maxMin: 150 },
+    { title: "Achtsamkeitsbasierte Stressreduktion (MBSR)", format: "Mixed", maxMin: 120 },
+    { title: "Digitale Achtsamkeits- & Meditationsprogramme", format: "Online", maxMin: 40 },
+    { title: "Achtsamkeits-Kurzinterventionen", format: "Mixed", maxMin: 60 }
   ],
   2: [
-    { title: "Digitale Stressmanagement-Programme", format: "Online" },
-    { title: "Entspannungsinterventionen", format: "Mixed" },
-    { title: "Stressmanagement-Kurzinterventionen", format: "Mixed" },
-    { title: "VR-gestützte Entspannung", format: "In-person" }
+    { title: "Digitale Stressmanagement-Programme", format: "Online", maxMin: 60 },
+    { title: "Entspannungsinterventionen", format: "Mixed", maxMin: 30 },
+    { title: "Stressmanagement-Kurzinterventionen", format: "Mixed", maxMin: 60 },
+    { title: "VR-gestützte Entspannung", format: "In-person", maxMin: 15 }
   ],
   3: [
-    { title: "KVT-basierte digitale Programme", format: "Online" },
-    { title: "ACT-basierte Online-Interventionen", format: "Online" }
+    { title: "KVT-basierte digitale Programme", format: "Online", maxMin: 60 },
+    { title: "ACT-basierte Online-Interventionen", format: "Online", maxMin: 75 }
   ],
   4: [
-    { title: "Betriebliche Bewegungsprogramme", format: "In-person Gruppe" },
-    { title: "Yoga-basierte Stressreduktion", format: "In-person Gruppe" },
-    { title: "Kompensatorische Bewegungsprogramme", format: "In-person Gruppe" }
+    { title: "Betriebliche Bewegungsprogramme", format: "In-person Gruppe", maxMin: 90 },
+    { title: "Yoga-basierte Stressreduktion", format: "In-person Gruppe", maxMin: 60 },
+    { title: "Kompensatorische Bewegungsprogramme", format: "In-person Gruppe", maxMin: 30 }
   ],
   5: [
-    { title: "Digitale Selbsthilfe-Programme", format: "Online" },
-    { title: "Internetbasiertes Problemlösetraining", format: "Online" }
+    { title: "Digitale Selbsthilfe-Programme", format: "Online", maxMin: 60 },
+    { title: "Internetbasiertes Problemlösetraining", format: "Online", maxMin: 60 }
   ],
   6: [
-    { title: "Positive Psychologie-Kurzinterventionen", format: "Online" }
+    { title: "Positive Psychologie-Kurzinterventionen", format: "Online", maxMin: 15 }
   ]
 };
 
@@ -370,10 +437,16 @@ function loadConfig() {
 }
 
 function getDefaultConfig() {
-  const cfg = {};
+  const cfg = { maxMinPerWeek: 120 };
   CLUSTERS.forEach(c => {
     cfg[c.id] = MASSNAHMEN[c.id].map(() => true);
   });
+  return cfg;
+}
+
+function loadConfigWithDefaults() {
+  const cfg = loadConfig();
+  if (cfg.maxMinPerWeek === undefined) cfg.maxMinPerWeek = 120;
   return cfg;
 }
 
@@ -413,7 +486,7 @@ function render() {
           ${measures.map((m, idx) => `
             <div class="measure-row">
               <div class="measure-info">
-                <div class="measure-title">${m.title}</div>
+                <div class="measure-title">${m.title}<span class="time-badge">${m.maxMin} min/Wo.</span></div>
                 <span class="measure-format ${getFormatClass(m.format)}">${m.format}</span>
               </div>
               <label class="toggle">
@@ -464,6 +537,42 @@ function setAll(enabled) {
 }
 
 // ═══════════════════════════════════════════════════════════════
+// ZEITBUDGET
+// ═══════════════════════════════════════════════════════════════
+
+function formatMinutes(min) {
+  const h = Math.floor(min / 60);
+  const m = min % 60;
+  return `${h} h ${m} min`;
+}
+
+function updateBudgetDisplay(val) {
+  const v = parseInt(val) || 120;
+  document.getElementById('budget-display').textContent = formatMinutes(v);
+}
+
+function updateBudget(val) {
+  let v = parseInt(val) || 120;
+  v = Math.max(30, Math.min(300, v));
+  // Snap to nearest 15
+  v = Math.round(v / 15) * 15;
+  const input = document.getElementById('budget-input');
+  input.value = v;
+  updateBudgetDisplay(v);
+
+  const cfg = loadConfigWithDefaults();
+  cfg.maxMinPerWeek = v;
+  saveConfig(cfg);
+}
+
+function initBudget() {
+  const cfg = loadConfigWithDefaults();
+  const input = document.getElementById('budget-input');
+  input.value = cfg.maxMinPerWeek;
+  updateBudgetDisplay(cfg.maxMinPerWeek);
+}
+
+// ═══════════════════════════════════════════════════════════════
 // TOAST
 // ═══════════════════════════════════════════════════════════════
 
@@ -480,6 +589,7 @@ function showToast() {
 // ═══════════════════════════════════════════════════════════════
 
 render();
+initBudget();
 </script>
 </body>
 </html>
