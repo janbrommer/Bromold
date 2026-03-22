@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin – Massnahmen-Verwaltung</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --primary: #2E4057;
+  --primary-light: #3d5474;
+  --accent: #5C7AEA;
+  --primary-gradient: linear-gradient(135deg, #2E4057, #3d5474);
+  --accent-gradient: linear-gradient(135deg, #2E4057, #5C7AEA);
+  --green: #2E7D32;
+  --green-bg: #C6EFCE;
+  --red: #9C0006;
+  --red-bg: #FFC7CE;
+  --bg: #F8F9FA;
+  --white: #FFFFFF;
+  --border: #DEE2E6;
+  --text: #212529;
+  --text-muted: #6C757D;
+  --format-online: #1565C0;
+  --format-mixed: #6A1B9A;
+  --format-inperson: #E65100;
+  --shadow-card: 0 1px 3px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.06);
+  --shadow-elevated: 0 4px 12px rgba(0,0,0,0.08), 0 12px 32px rgba(0,0,0,0.12);
+  --radius: 12px;
+  --radius-sm: 8px;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  background: var(--bg);
+  background-image: radial-gradient(ellipse at 20% 50%, rgba(92,122,234,0.03) 0%, transparent 50%),
+                    radial-gradient(ellipse at 80% 20%, rgba(46,64,87,0.03) 0%, transparent 50%);
+  background-attachment: fixed;
+  color: var(--text);
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+.container {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 24px 16px 48px;
+}
+
+/* Header */
+.hero-header {
+  background: var(--primary-gradient);
+  border-radius: var(--radius) var(--radius) 0 0;
+  padding: 28px 28px 24px;
+  color: var(--white);
+  position: relative;
+  overflow: hidden;
+}
+.hero-header::after {
+  content: '';
+  position: absolute;
+  top: -40%;
+  right: -10%;
+  width: 200px;
+  height: 200px;
+  background: radial-gradient(circle, rgba(255,255,255,0.06) 0%, transparent 70%);
+  border-radius: 50%;
+}
+.hero-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--white);
+  margin: 0 0 4px;
+}
+.hero-subtitle {
+  font-size: 0.95rem;
+  color: rgba(255,255,255,0.8);
+  font-weight: 400;
+}
+
+/* Content box */
+.content-box {
+  background: var(--white);
+  border-radius: 0 0 var(--radius) var(--radius);
+  padding: 24px 28px 32px;
+  box-shadow: var(--shadow-elevated);
+}
+
+/* Global actions */
+.global-actions {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 20px;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-family: 'Inter', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.btn-primary {
+  background: var(--primary-gradient);
+  color: var(--white);
+  box-shadow: 0 2px 8px rgba(46,64,87,0.25);
+}
+.btn-primary:hover {
+  box-shadow: 0 4px 16px rgba(46,64,87,0.35);
+  transform: translateY(-1px);
+}
+.btn-secondary {
+  background: var(--white);
+  color: var(--text);
+  border: 1px solid var(--border);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+}
+.btn-secondary:hover {
+  background: var(--bg);
+  border-color: #ced4da;
+}
+.btn-danger {
+  background: var(--red-bg);
+  color: var(--red);
+  border: 1px solid rgba(156,0,6,0.2);
+}
+.btn-danger:hover {
+  background: #ffb3ba;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--text-muted);
+  text-decoration: none;
+  font-size: 0.9rem;
+  font-weight: 500;
+  margin-left: auto;
+  transition: color 0.2s;
+}
+.back-link:hover { color: var(--primary); }
+
+/* Cluster group */
+.cluster-group {
+  margin-bottom: 16px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+.cluster-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  background: var(--bg);
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.15s;
+}
+.cluster-header:hover { background: #eef0f3; }
+.cluster-header .arrow {
+  transition: transform 0.25s ease;
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+.cluster-header.open .arrow { transform: rotate(90deg); }
+.cluster-name {
+  font-weight: 600;
+  font-size: 1rem;
+  color: var(--primary);
+  flex: 1;
+}
+.cluster-counter {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  font-weight: 500;
+  white-space: nowrap;
+}
+.cluster-body {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+}
+.cluster-body.open {
+  max-height: 800px;
+}
+
+/* Measure row */
+.measure-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 18px;
+  border-top: 1px solid var(--border);
+  transition: background 0.15s;
+}
+.measure-row:hover { background: rgba(92,122,234,0.02); }
+.measure-info { flex: 1; min-width: 0; }
+.measure-title {
+  font-weight: 500;
+  font-size: 0.95rem;
+  color: var(--text);
+}
+.measure-format {
+  display: inline-block;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 4px;
+  margin-top: 4px;
+}
+.fmt-online { background: rgba(21,101,192,0.1); color: var(--format-online); }
+.fmt-mixed { background: rgba(106,27,154,0.1); color: var(--format-mixed); }
+.fmt-inperson { background: rgba(230,81,0,0.1); color: var(--format-inperson); }
+
+/* Toggle switch */
+.toggle {
+  position: relative;
+  width: 48px;
+  height: 26px;
+  flex-shrink: 0;
+}
+.toggle input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+.toggle-slider {
+  position: absolute;
+  inset: 0;
+  background: #ccc;
+  border-radius: 26px;
+  cursor: pointer;
+  transition: background 0.25s ease;
+}
+.toggle-slider::before {
+  content: '';
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  left: 3px;
+  bottom: 3px;
+  background: var(--white);
+  border-radius: 50%;
+  transition: transform 0.25s ease;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+.toggle input:checked + .toggle-slider {
+  background: var(--accent);
+}
+.toggle input:checked + .toggle-slider::before {
+  transform: translateX(22px);
+}
+
+/* Status toast */
+.toast {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%) translateY(80px);
+  background: var(--primary);
+  color: var(--white);
+  padding: 10px 24px;
+  border-radius: var(--radius-sm);
+  font-size: 0.9rem;
+  font-weight: 500;
+  box-shadow: var(--shadow-elevated);
+  opacity: 0;
+  transition: all 0.3s ease;
+  pointer-events: none;
+  z-index: 1000;
+}
+.toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+  <div class="hero-header">
+    <div class="hero-title">Massnahmen-Verwaltung</div>
+    <div class="hero-subtitle">Massnahmen pro Cluster aktivieren oder deaktivieren</div>
+  </div>
+
+  <div class="content-box">
+    <div class="global-actions">
+      <button class="btn btn-primary" onclick="setAll(true)">Alle aktivieren</button>
+      <button class="btn btn-danger" onclick="setAll(false)">Alle deaktivieren</button>
+      <a href="index.html" class="back-link">&larr; Zur Bedarfserhebung</a>
+    </div>
+
+    <div id="clusters-container"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast">Gespeichert</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+// DATA (mirrored from index.html)
+// ═══════════════════════════════════════════════════════════════
+
+const CLUSTERS = [
+  { id: 1, name: "Achtsamkeit & Meditation" },
+  { id: 2, name: "Stressmanagement & Entspannung" },
+  { id: 3, name: "Verhaltenstherapeutische Ansätze" },
+  { id: 4, name: "Körperliche Aktivität & Wohlbefinden" },
+  { id: 5, name: "Selbstmanagement & Problemlösung" },
+  { id: 6, name: "Emotionale & Positive Kompetenzen" }
+];
+
+const MASSNAHMEN = {
+  1: [
+    { title: "Betriebliche Achtsamkeitstrainings", format: "Mixed / In-person" },
+    { title: "Achtsamkeitsbasierte Stressreduktion (MBSR)", format: "Mixed" },
+    { title: "Digitale Achtsamkeits- & Meditationsprogramme", format: "Online" },
+    { title: "Achtsamkeits-Kurzinterventionen", format: "Mixed" }
+  ],
+  2: [
+    { title: "Digitale Stressmanagement-Programme", format: "Online" },
+    { title: "Entspannungsinterventionen", format: "Mixed" },
+    { title: "Stressmanagement-Kurzinterventionen", format: "Mixed" },
+    { title: "VR-gestützte Entspannung", format: "In-person" }
+  ],
+  3: [
+    { title: "KVT-basierte digitale Programme", format: "Online" },
+    { title: "ACT-basierte Online-Interventionen", format: "Online" }
+  ],
+  4: [
+    { title: "Betriebliche Bewegungsprogramme", format: "In-person Gruppe" },
+    { title: "Yoga-basierte Stressreduktion", format: "In-person Gruppe" },
+    { title: "Kompensatorische Bewegungsprogramme", format: "In-person Gruppe" }
+  ],
+  5: [
+    { title: "Digitale Selbsthilfe-Programme", format: "Online" },
+    { title: "Internetbasiertes Problemlösetraining", format: "Online" }
+  ],
+  6: [
+    { title: "Positive Psychologie-Kurzinterventionen", format: "Online" }
+  ]
+};
+
+const STORAGE_KEY = 'bromold_config';
+
+// ═══════════════════════════════════════════════════════════════
+// CONFIG
+// ═══════════════════════════════════════════════════════════════
+
+function loadConfig() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) return JSON.parse(raw);
+  } catch (e) { /* ignore */ }
+  return getDefaultConfig();
+}
+
+function getDefaultConfig() {
+  const cfg = {};
+  CLUSTERS.forEach(c => {
+    cfg[c.id] = MASSNAHMEN[c.id].map(() => true);
+  });
+  return cfg;
+}
+
+function saveConfig(cfg) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(cfg));
+  showToast();
+}
+
+// ═══════════════════════════════════════════════════════════════
+// RENDER
+// ═══════════════════════════════════════════════════════════════
+
+function getFormatClass(format) {
+  const f = format.toLowerCase();
+  if (f.includes('online')) return 'fmt-online';
+  if (f.includes('mixed')) return 'fmt-mixed';
+  return 'fmt-inperson';
+}
+
+function render() {
+  const cfg = loadConfig();
+  const container = document.getElementById('clusters-container');
+
+  container.innerHTML = CLUSTERS.map(c => {
+    const measures = MASSNAHMEN[c.id];
+    const activeCount = cfg[c.id].filter(Boolean).length;
+    const total = measures.length;
+
+    return `
+      <div class="cluster-group">
+        <div class="cluster-header open" onclick="toggleCluster(this)">
+          <span class="arrow">&#9654;</span>
+          <span class="cluster-name">${c.name}</span>
+          <span class="cluster-counter" id="counter-${c.id}">${activeCount} von ${total} aktiv</span>
+        </div>
+        <div class="cluster-body open">
+          ${measures.map((m, idx) => `
+            <div class="measure-row">
+              <div class="measure-info">
+                <div class="measure-title">${m.title}</div>
+                <span class="measure-format ${getFormatClass(m.format)}">${m.format}</span>
+              </div>
+              <label class="toggle">
+                <input type="checkbox" ${cfg[c.id][idx] ? 'checked' : ''}
+                       onchange="toggleMeasure(${c.id}, ${idx}, this.checked)">
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+// ═══════════════════════════════════════════════════════════════
+// ACTIONS
+// ═══════════════════════════════════════════════════════════════
+
+function toggleCluster(header) {
+  header.classList.toggle('open');
+  const body = header.nextElementSibling;
+  body.classList.toggle('open');
+}
+
+function toggleMeasure(clusterId, index, enabled) {
+  const cfg = loadConfig();
+  cfg[clusterId][index] = enabled;
+  saveConfig(cfg);
+  updateCounter(clusterId, cfg);
+}
+
+function updateCounter(clusterId, cfg) {
+  const el = document.getElementById('counter-' + clusterId);
+  if (!el) return;
+  const activeCount = cfg[clusterId].filter(Boolean).length;
+  const total = MASSNAHMEN[clusterId].length;
+  el.textContent = `${activeCount} von ${total} aktiv`;
+}
+
+function setAll(enabled) {
+  const cfg = loadConfig();
+  CLUSTERS.forEach(c => {
+    cfg[c.id] = cfg[c.id].map(() => enabled);
+  });
+  saveConfig(cfg);
+  render();
+}
+
+// ═══════════════════════════════════════════════════════════════
+// TOAST
+// ═══════════════════════════════════════════════════════════════
+
+let toastTimeout;
+function showToast() {
+  const toast = document.getElementById('toast');
+  toast.classList.add('show');
+  clearTimeout(toastTimeout);
+  toastTimeout = setTimeout(() => toast.classList.remove('show'), 1500);
+}
+
+// ═══════════════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════════════
+
+render();
+</script>
+</body>
+</html>

@@ -836,6 +836,24 @@ let selectClusters = [];       // Top-2 Bedarfs-Cluster
 let selectStep = 0;            // 0 = Prio 1, 1 = Prio 2
 
 // ═══════════════════════════════════════════════════════════════
+// ADMIN CONFIG (localStorage)
+// ═══════════════════════════════════════════════════════════════
+
+function getActiveMassnahmen(clusterId) {
+  const all = MASSNAHMEN[clusterId] || [];
+  try {
+    const raw = localStorage.getItem('bromold_config');
+    if (raw) {
+      const cfg = JSON.parse(raw);
+      if (cfg[clusterId]) {
+        return all.filter((_, i) => cfg[clusterId][i] !== false);
+      }
+    }
+  } catch (e) { /* fallback: all active */ }
+  return all;
+}
+
+// ═══════════════════════════════════════════════════════════════
 // NAVIGATION
 // ═══════════════════════════════════════════════════════════════
 
@@ -1167,9 +1185,16 @@ function showMassnahmenSelect() {
   selectedMassnahmen = {};
   selectStep = 0;
 
-  // Auto-select clusters that have only 1 measure
+  // Filter out clusters with no active measures; auto-select if only 1
+  selectClusters = selectClusters.filter(s => getActiveMassnahmen(s.id).length > 0);
+  if (selectClusters.length === 0) {
+    container.innerHTML = '<div class="no-measures">Alle Cluster liegen im grünen Bereich. Kein spezifisches Training erforderlich – weiter so!</div>';
+    renderSummaryRadar(computeScores());
+    showScreen('screen-massnahmen');
+    return;
+  }
   selectClusters.forEach((s, idx) => {
-    const measures = MASSNAHMEN[s.id] || [];
+    const measures = getActiveMassnahmen(s.id);
     if (measures.length === 1) {
       selectedMassnahmen[s.id] = 0;
     }
@@ -1202,7 +1227,7 @@ function prevSelectStep() {
 
 function renderSelectStep() {
   const cluster = selectClusters[selectStep];
-  const measures = MASSNAHMEN[cluster.id] || [];
+  const measures = getActiveMassnahmen(cluster.id);
   const badgeClass = cluster.level === 'red' ? 'ampel-red' : 'ampel-yellow';
   const badgeText = cluster.level === 'red' ? 'Hoher Bedarf' : 'Moderater Bedarf';
   const prioNr = selectStep + 1;
@@ -1284,7 +1309,7 @@ function showMassnahmenSummary() {
   container.innerHTML = selectClusters.map((s, idx) => {
     const badgeClass = s.level === 'red' ? 'ampel-red' : 'ampel-yellow';
     const badgeText = s.level === 'red' ? 'Hoher Bedarf' : 'Moderater Bedarf';
-    const measures = MASSNAHMEN[s.id] || [];
+    const measures = getActiveMassnahmen(s.id);
     const chosenIdx = selectedMassnahmen[s.id];
     const m = measures[chosenIdx];
     if (!m) return '';
