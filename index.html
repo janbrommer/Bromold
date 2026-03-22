@@ -835,7 +835,7 @@ const CLUSTERS = [
   { id: 1, name: "Achtsamkeit & Meditation",              items: [3,7,16,23,26,31,40], greenMin: 3.50, redBelow: 2.50 },
   { id: 2, name: "Stressmanagement & Entspannung",        items: [6,12,15,19,28,32,38], greenMin: 4.00, redBelow: 3.00 },
   { id: 3, name: "Gewohnheiten & Denkweisen",       items: [2,11,18,20,25,34,41], greenMin: 3.50, redBelow: 2.50 },
-  { id: 4, name: "Bewegung & körperliches Wohlbefinden & Wohlbefinden",   items: [5,9,14,24,30,33,37], greenMin: 3.50, redBelow: 2.50 },
+  { id: 4, name: "Bewegung & körperliches Wohlbefinden",   items: [5,9,14,24,30,33,37], greenMin: 3.50, redBelow: 2.50 },
   { id: 5, name: "Selbstmanagement & Problemlösung",       items: [1,8,17,22,27,35,39], greenMin: 4.00, redBelow: 3.00 },
   { id: 6, name: "Emotionale & Positive Kompetenzen",      items: [4,10,13,21,29,36,42], greenMin: 3.50, redBelow: 2.50 }
 ];
@@ -934,7 +934,7 @@ let summaryRadarChart = null;
 let advancing = false;
 
 // Massnahmen-Auswahl State
-let selectedMassnahmen = {};  // { clusterId: massnahmenIndex }
+let selectedMassnahmen = new Set();  // Set of "clusterId-index" keys
 let selectClusters = [];       // All Bedarfs-Cluster (red + yellow)
 let timeUsed = 0;
 let maxMinPerWeek = 120;
@@ -1304,7 +1304,7 @@ function showMassnahmenSelect() {
     return;
   }
 
-  selectedMassnahmen = {};
+  selectedMassnahmen = new Set();
   timeUsed = 0;
   maxMinPerWeek = getMaxMinPerWeek();
 
@@ -1314,16 +1314,17 @@ function showMassnahmenSelect() {
 
 function computeTimeUsed() {
   let total = 0;
-  for (const clusterId in selectedMassnahmen) {
-    const measures = getActiveMassnahmen(parseInt(clusterId));
-    const m = measures[selectedMassnahmen[clusterId]];
+  for (const key of selectedMassnahmen) {
+    const [cid, idx] = key.split('-').map(Number);
+    const measures = getActiveMassnahmen(cid);
+    const m = measures[idx];
     if (m) total += m.maxMin;
   }
   return total;
 }
 
 function getSelectedCount() {
-  return Object.keys(selectedMassnahmen).length;
+  return selectedMassnahmen.size;
 }
 
 function renderSelectScreen() {
@@ -1340,7 +1341,7 @@ function renderSelectScreen() {
   container.innerHTML = `
     <div class="select-header">
       <h2>Massnahmen auswählen</h2>
-      <p class="select-hint">Wählen Sie 1–3 Massnahmen innerhalb Ihres Zeitbudgets. Pro Cluster max. 1 Massnahme.</p>
+      <p class="select-hint">Wählen Sie Massnahmen innerhalb Ihres Zeitbudgets.</p>
     </div>
 
     <div class="time-budget-header">
@@ -1352,19 +1353,19 @@ function renderSelectScreen() {
         <div class="time-budget-fill${pct > 100 ? ' over' : ''}" style="width:${Math.min(pct, 100)}%"></div>
       </div>
       <div class="time-budget-text">
-        <span>${count} von 3 Massnahmen gewählt</span>
+        <span>${count} Massnahme${count !== 1 ? 'n' : ''} gewählt</span>
         <span>${maxMinPerWeek} min/Woche Budget</span>
       </div>
     </div>
 
     ${redClusters.length > 0 ? `
       <div class="section-divider section-divider-red">Hoher Bedarf</div>
-      ${redClusters.map(s => renderClusterSelectGroup(s, remaining, count)).join('')}
+      ${redClusters.map(s => renderClusterSelectGroup(s, remaining)).join('')}
     ` : ''}
 
     ${yellowClusters.length > 0 ? `
       <div class="section-divider section-divider-yellow">Moderater Bedarf</div>
-      ${yellowClusters.map(s => renderClusterSelectGroup(s, remaining, count)).join('')}
+      ${yellowClusters.map(s => renderClusterSelectGroup(s, remaining)).join('')}
     ` : ''}
 
     <div class="btn-group">
@@ -1379,12 +1380,10 @@ function renderSelectScreen() {
   `;
 }
 
-function renderClusterSelectGroup(cluster, remaining, count) {
+function renderClusterSelectGroup(cluster, remaining) {
   const measures = getActiveMassnahmen(cluster.id);
   const badgeClass = cluster.level === 'red' ? 'ampel-red' : 'ampel-yellow';
   const badgeText = cluster.level === 'red' ? 'Hoher Bedarf' : 'Moderater Bedarf';
-  const selectedIdx = selectedMassnahmen[cluster.id];
-  const hasSelection = selectedIdx !== undefined;
 
   return `
     <div class="select-cluster-header">
@@ -1393,16 +1392,12 @@ function renderClusterSelectGroup(cluster, remaining, count) {
       <span class="cluster-score">(Score: ${cluster.score.toFixed(2)})</span>
     </div>
     ${measures.map((m, idx) => {
-      const isSelected = selectedIdx === idx;
+      const key = cluster.id + '-' + idx;
+      const isSelected = selectedMassnahmen.has(key);
       const wouldExceed = !isSelected && m.maxMin > remaining;
-      const maxReached = !isSelected && count >= 3;
-      const clusterTaken = !isSelected && hasSelection;
-      const isDisabled = wouldExceed || maxReached || clusterTaken;
+      const isDisabled = wouldExceed;
 
-      let disabledReason = '';
-      if (wouldExceed) disabledReason = 'Zeitbudget überschritten';
-      else if (maxReached) disabledReason = 'Maximum von 3 Massnahmen erreicht';
-      else if (clusterTaken) disabledReason = 'Bereits eine Massnahme in diesem Cluster gewählt';
+      const disabledReason = wouldExceed ? 'Zeitbudget überschritten' : '';
 
       return `
         <div class="mass-card-selectable${isSelected ? ' selected' : ''}${isDisabled ? ' disabled' : ''}"
@@ -1428,12 +1423,11 @@ function renderClusterSelectGroup(cluster, remaining, count) {
 }
 
 function toggleMassnahme(clusterId, index) {
-  if (selectedMassnahmen[clusterId] === index) {
-    // Deselect
-    delete selectedMassnahmen[clusterId];
+  const key = clusterId + '-' + index;
+  if (selectedMassnahmen.has(key)) {
+    selectedMassnahmen.delete(key);
   } else {
-    // Select (replace if cluster already has selection)
-    selectedMassnahmen[clusterId] = index;
+    selectedMassnahmen.add(key);
   }
   renderSelectScreen();
 }
@@ -1442,49 +1436,63 @@ function showMassnahmenSummary() {
   const container = document.getElementById('massnahmen-container');
   const tagLegendItems = Object.entries(TAG_LABELS).map(([k,v]) => `${k} = ${v}`).join(', ');
   const totalTime = computeTimeUsed();
+  const totalCount = selectedMassnahmen.size;
+
+  // Group selected measures by cluster
+  const clusterSelections = {};  // { clusterId: [idx, idx, ...] }
+  for (const key of selectedMassnahmen) {
+    const [cid, idx] = key.split('-').map(Number);
+    if (!clusterSelections[cid]) clusterSelections[cid] = [];
+    clusterSelections[cid].push(idx);
+  }
 
   // Build ordered list: red clusters first (by score asc), then yellow
   const chosenClusters = selectClusters
-    .filter(s => selectedMassnahmen[s.id] !== undefined)
+    .filter(s => clusterSelections[s.id] && clusterSelections[s.id].length > 0)
     .sort((a, b) => {
       if (a.level === 'red' && b.level !== 'red') return -1;
       if (a.level !== 'red' && b.level === 'red') return 1;
       return a.score - b.score;
     });
 
+  let prioNr = 0;
   container.innerHTML = `
     <div style="background:var(--bg); border-radius:var(--radius-sm); padding:12px 16px; margin-bottom:16px; font-size:0.9rem; color:var(--text-muted);">
-      <strong>${chosenClusters.length} Massnahme${chosenClusters.length !== 1 ? 'n' : ''}</strong> gewählt –
+      <strong>${totalCount} Massnahme${totalCount !== 1 ? 'n' : ''}</strong> gewählt –
       Gesamtaufwand: <strong>${totalTime} min/Woche</strong> von ${maxMinPerWeek} min Budget
     </div>
-  ` + chosenClusters.map((s, idx) => {
+  ` + chosenClusters.map(s => {
     const badgeClass = s.level === 'red' ? 'ampel-red' : 'ampel-yellow';
     const badgeText = s.level === 'red' ? 'Hoher Bedarf' : 'Moderater Bedarf';
     const measures = getActiveMassnahmen(s.id);
-    const chosenIdx = selectedMassnahmen[s.id];
-    const m = measures[chosenIdx];
-    if (!m) return '';
-    const prioNr = idx + 1;
+    const indices = clusterSelections[s.id];
 
     return `
       <div class="cluster-group">
         <div class="cluster-header cluster-header-${s.level === 'red' ? 'red' : 'yellow'} open" style="cursor:default;">
-          <span class="ampel-badge ${badgeClass}">Priorität ${prioNr}</span>
+          <span class="ampel-badge ${badgeClass}">${badgeText}</span>
           <h3>${s.name} <span style="font-weight:400;color:var(--text-muted);">(${s.score.toFixed(2)})</span></h3>
         </div>
         <div class="cluster-body open">
-          <div class="mass-card">
-            <div class="mass-title">${m.title}<span class="time-badge">${m.maxMin} min/Wo.</span></div>
-            ${m.desc ? `<p class="mass-desc">${m.desc}</p>` : ''}
-            <span class="mass-format ${getFormatClass(m.format)}">${m.format}</span>
-            <div class="tags">
-              ${m.tags.map(tag =>
-                `<span class="tag ${tag.r ? 'tag-required' : 'tag-optional'}" title="${TAG_LABELS[tag.t] || tag.t}">
-                  <span class="tag-dot">${tag.r ? '●' : '○'}</span>${tag.t}
-                </span>`
-              ).join('')}
-            </div>
-          </div>
+          ${indices.map(chosenIdx => {
+            const m = measures[chosenIdx];
+            if (!m) return '';
+            prioNr++;
+            return `
+              <div class="mass-card">
+                <div class="mass-title"><span style="color:var(--accent);font-size:0.8rem;font-weight:700;margin-right:6px;">${prioNr}.</span>${m.title}<span class="time-badge">${m.maxMin} min/Wo.</span></div>
+                ${m.desc ? `<p class="mass-desc">${m.desc}</p>` : ''}
+                <span class="mass-format ${getFormatClass(m.format)}">${m.format}</span>
+                <div class="tags">
+                  ${m.tags.map(tag =>
+                    `<span class="tag ${tag.r ? 'tag-required' : 'tag-optional'}" title="${TAG_LABELS[tag.t] || tag.t}">
+                      <span class="tag-dot">${tag.r ? '●' : '○'}</span>${tag.t}
+                    </span>`
+                  ).join('')}
+                </div>
+              </div>
+            `;
+          }).join('')}
         </div>
       </div>
     `;
@@ -1518,7 +1526,7 @@ function resetApp() {
   Object.keys(answers).forEach(k => delete answers[k]);
   currentItem = 0;
   advancing = false;
-  selectedMassnahmen = {};
+  selectedMassnahmen = new Set();
   selectClusters = [];
   timeUsed = 0;
   if (radarChart) { radarChart.destroy(); radarChart = null; }
