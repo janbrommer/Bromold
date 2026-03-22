@@ -1,0 +1,1354 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bedarfserhebung – Individualisierter Trainingsplan</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --primary: #2E4057;
+  --primary-light: #3d5474;
+  --accent: #5C7AEA;
+  --primary-gradient: linear-gradient(135deg, #2E4057, #3d5474);
+  --accent-gradient: linear-gradient(135deg, #2E4057, #5C7AEA);
+  --green: #2E7D32;
+  --green-bg: #C6EFCE;
+  --yellow: #9C6500;
+  --yellow-bg: #FFEB9C;
+  --red: #9C0006;
+  --red-bg: #FFC7CE;
+  --bg: #F8F9FA;
+  --white: #FFFFFF;
+  --border: #DEE2E6;
+  --text: #212529;
+  --text-muted: #6C757D;
+  --format-online: #1565C0;
+  --format-mixed: #6A1B9A;
+  --format-inperson: #E65100;
+  --shadow-card: 0 1px 3px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.06);
+  --shadow-card-hover: 0 2px 6px rgba(0,0,0,0.06), 0 8px 24px rgba(0,0,0,0.1);
+  --shadow-elevated: 0 4px 12px rgba(0,0,0,0.08), 0 12px 32px rgba(0,0,0,0.12);
+  --radius: 12px;
+  --radius-sm: 8px;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  background: var(--bg);
+  background-image: radial-gradient(ellipse at 20% 50%, rgba(92,122,234,0.03) 0%, transparent 50%),
+                    radial-gradient(ellipse at 80% 20%, rgba(46,64,87,0.03) 0%, transparent 50%);
+  background-attachment: fixed;
+  color: var(--text);
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: #b0bec5; border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--primary-light); }
+
+.container {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 24px 16px 48px;
+}
+
+h1 { font-size: 1.5rem; color: var(--primary); margin-bottom: 8px; font-weight: 700; }
+h2 { font-size: 1.25rem; color: var(--primary); margin-bottom: 12px; font-weight: 700; }
+h3 { font-size: 1.1rem; color: var(--primary); margin-bottom: 8px; font-weight: 600; }
+
+/* Screen Transitions */
+.screen { display: none; opacity: 0; transform: translateY(8px); }
+.screen.active {
+  display: block;
+  animation: screenFadeIn 0.4s ease forwards;
+}
+@keyframes screenFadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ============================================
+   WELCOME / HERO
+   ============================================ */
+.hero-header {
+  background: var(--primary-gradient);
+  border-radius: var(--radius) var(--radius) 0 0;
+  padding: 36px 28px 32px;
+  color: var(--white);
+  position: relative;
+  overflow: hidden;
+}
+.hero-header::after {
+  content: '';
+  position: absolute;
+  top: -40%;
+  right: -10%;
+  width: 200px;
+  height: 200px;
+  background: radial-gradient(circle, rgba(255,255,255,0.06) 0%, transparent 70%);
+  border-radius: 50%;
+}
+.hero-title-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+.hero-icon {
+  flex-shrink: 0;
+  opacity: 0.9;
+}
+.hero-title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--white);
+  margin: 0;
+  letter-spacing: -0.02em;
+}
+.hero-subtitle {
+  font-size: 1rem;
+  color: rgba(255,255,255,0.8);
+  font-weight: 400;
+  line-height: 1.5;
+}
+
+.welcome-box {
+  background: var(--white);
+  border-radius: 0 0 var(--radius) var(--radius);
+  padding: 32px 28px;
+  box-shadow: var(--shadow-elevated);
+}
+.welcome-box p { margin-bottom: 12px; color: var(--text-muted); line-height: 1.7; }
+.scale-table { width: 100%; border-collapse: collapse; margin: 16px 0; }
+.scale-table th, .scale-table td {
+  padding: 8px 12px; text-align: left; border-bottom: 1px solid var(--border);
+}
+.scale-table th { background: var(--bg); font-weight: 600; font-size: 0.9rem; }
+.scale-table td:first-child {
+  font-weight: 700; width: 44px; text-align: center;
+  color: var(--primary);
+}
+
+/* ============================================
+   BUTTONS
+   ============================================ */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  padding: 12px 28px; border: none; border-radius: var(--radius-sm);
+  font-family: 'Inter', sans-serif;
+  font-size: 1rem; font-weight: 600; cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+.btn::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at var(--ripple-x, 50%) var(--ripple-y, 50%), rgba(255,255,255,0.3) 0%, transparent 60%);
+  opacity: 0;
+  transition: opacity 0.4s;
+}
+.btn:active::after { opacity: 1; transition: opacity 0s; }
+.btn:active { transform: scale(0.97); }
+
+.btn-primary {
+  background: var(--primary-gradient);
+  color: var(--white);
+  box-shadow: 0 2px 8px rgba(46,64,87,0.25);
+}
+.btn-primary:hover {
+  box-shadow: 0 4px 16px rgba(46,64,87,0.35);
+  transform: translateY(-1px);
+}
+.btn-primary:active { transform: scale(0.97) translateY(0); }
+
+.btn-start {
+  background: var(--accent-gradient);
+  color: var(--white);
+  box-shadow: 0 2px 12px rgba(92,122,234,0.3);
+  padding: 14px 36px;
+  font-size: 1.05rem;
+  border-radius: 10px;
+}
+.btn-start:hover {
+  box-shadow: 0 4px 20px rgba(92,122,234,0.45);
+  transform: translateY(-2px);
+}
+.btn-start:active { transform: scale(0.97) translateY(0); }
+
+.btn-secondary {
+  background: var(--white);
+  color: var(--text);
+  border: 1px solid var(--border);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+}
+.btn-secondary:hover {
+  background: var(--bg);
+  border-color: #ced4da;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+}
+
+.btn-group { display: flex; gap: 12px; margin-top: 24px; justify-content: center; }
+
+/* ============================================
+   PROGRESS BAR
+   ============================================ */
+.progress-bar {
+  width: 100%; height: 6px; background: var(--border);
+  border-radius: 3px; margin-bottom: 20px; overflow: hidden;
+}
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary), var(--accent));
+  border-radius: 3px;
+  transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+}
+.progress-fill::after {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+  animation: progressShimmer 2s infinite;
+}
+@keyframes progressShimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+.page-indicator {
+  text-align: center; font-size: 0.85rem;
+  color: var(--text-muted); margin-bottom: 16px;
+  font-weight: 500;
+}
+
+/* ============================================
+   QUESTIONNAIRE ITEMS
+   ============================================ */
+.q-card {
+  background: var(--white);
+  border-radius: var(--radius);
+  padding: 24px 24px;
+  margin-bottom: 12px;
+  box-shadow: var(--shadow-card);
+  border-left: 3px solid var(--border);
+  transition: box-shadow 0.2s, border-color 0.3s;
+  animation: cardSlideIn 0.35s ease both;
+}
+
+@keyframes cardSlideIn {
+  from { opacity: 0; transform: translateX(30px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+.q-card.slide-out {
+  animation: cardSlideOut 0.2s ease both;
+}
+@keyframes cardSlideOut {
+  from { opacity: 1; transform: translateX(0); }
+  to { opacity: 0; transform: translateX(-30px); }
+}
+.q-card.slide-in-reverse {
+  animation: cardSlideInReverse 0.35s ease both;
+}
+@keyframes cardSlideInReverse {
+  from { opacity: 0; transform: translateX(-30px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+.q-card.answered { border-left-color: var(--green); }
+.q-card.unanswered { box-shadow: 0 0 0 2px var(--red-bg); border-left-color: var(--red); }
+
+.q-number {
+  display: inline-block;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--accent);
+  background: rgba(92,122,234,0.08);
+  padding: 2px 10px;
+  border-radius: 20px;
+  margin-bottom: 6px;
+}
+.q-text { font-size: 0.95rem; margin-bottom: 12px; font-weight: 500; line-height: 1.5; }
+.likert-row { display: flex; gap: 6px; flex-wrap: wrap; }
+.likert-btn {
+  flex: 1; min-width: 54px; padding: 10px 4px;
+  border: 2px solid var(--border); border-radius: 10px;
+  background: var(--white); cursor: pointer;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.85rem; font-weight: 600; text-align: center;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  color: var(--text-muted);
+  line-height: 1.3;
+}
+.likert-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: rgba(92,122,234,0.04);
+}
+.likert-btn.selected {
+  background: var(--primary);
+  color: var(--white);
+  border-color: var(--primary);
+  transform: scale(1.05);
+  box-shadow: 0 2px 8px rgba(46,64,87,0.25);
+  animation: likertBounce 0.3s ease;
+}
+@keyframes likertBounce {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+  100% { transform: scale(1.05); }
+}
+.likert-label { display: block; font-size: 0.68rem; margin-top: 3px; font-weight: 400; }
+/* Auto-advance: disable pointer events briefly after selection */
+.q-card.advancing .likert-btn { pointer-events: none; }
+
+/* ============================================
+   RESULTS
+   ============================================ */
+.results-grid {
+  display: grid; gap: 16px;
+  margin-top: 20px;
+}
+.chart-wrapper {
+  background: var(--white);
+  border-radius: var(--radius);
+  padding: 24px;
+  box-shadow: var(--shadow-card);
+  position: relative;
+  overflow: hidden;
+}
+.chart-wrapper::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--primary), var(--accent));
+}
+.chart-wrapper canvas { max-height: 400px; }
+
+.ampel-table { width: 100%; border-collapse: collapse; margin-top: 16px; }
+.ampel-table th {
+  padding: 10px 12px; text-align: left;
+  border-bottom: 2px solid var(--primary);
+  font-size: 0.85rem; color: var(--primary);
+  font-weight: 600;
+}
+.ampel-table td {
+  padding: 12px 12px; border-bottom: 1px solid var(--border);
+  font-size: 0.9rem;
+}
+.ampel-table tr { position: relative; }
+.ampel-table tr.ampel-row-green td { border-left: 3px solid var(--green); }
+.ampel-table tr.ampel-row-yellow td { border-left: 3px solid var(--yellow); }
+.ampel-table tr.ampel-row-red td { border-left: 3px solid var(--red); }
+.ampel-table tr.ampel-row-green td:first-child,
+.ampel-table tr.ampel-row-yellow td:first-child,
+.ampel-table tr.ampel-row-red td:first-child { padding-left: 16px; }
+
+.ampel-badge {
+  display: inline-block; padding: 4px 12px;
+  border-radius: 20px; font-size: 0.8rem; font-weight: 600;
+}
+.ampel-green { background: var(--green-bg); color: var(--green); }
+.ampel-yellow { background: var(--yellow-bg); color: var(--yellow); }
+.ampel-red { background: var(--red-bg); color: var(--red); }
+
+.score-val { font-weight: 700; font-variant-numeric: tabular-nums; font-size: 1rem; }
+.score-val.score-green { color: var(--green); }
+.score-val.score-yellow { color: var(--yellow); }
+.score-val.score-red { color: var(--red); }
+
+/* Legend */
+.chart-legend-custom {
+  display: flex; flex-wrap: wrap; gap: 16px;
+  justify-content: center;
+  margin-top: 16px; padding-top: 12px;
+  border-top: 1px solid var(--border);
+}
+.legend-item {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 0.82rem; color: var(--text-muted);
+}
+.legend-dot {
+  width: 10px; height: 10px; border-radius: 50%;
+  display: inline-block; flex-shrink: 0;
+}
+.legend-line {
+  width: 18px; height: 2px;
+  display: inline-block; flex-shrink: 0;
+  border-top: 2px dashed;
+}
+
+/* ============================================
+   MASSNAHMEN
+   ============================================ */
+.massnahmen-section { margin-top: 24px; }
+.cluster-group {
+  margin-bottom: 16px;
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: var(--shadow-card);
+}
+.cluster-header {
+  display: flex; align-items: center; gap: 10px;
+  padding: 14px 18px;
+  border-bottom: 1px solid rgba(0,0,0,0.06);
+  cursor: pointer; user-select: none;
+  transition: background 0.2s;
+}
+.cluster-header-red {
+  background: linear-gradient(135deg, #fff5f5, #ffffff);
+}
+.cluster-header-yellow {
+  background: linear-gradient(135deg, #fffbf0, #ffffff);
+}
+.cluster-header:hover { filter: brightness(0.98); }
+.cluster-header .ampel-badge { flex-shrink: 0; }
+.cluster-header h3 { margin: 0; flex: 1; font-size: 1rem; }
+.cluster-header .chevron {
+  transition: transform 0.2s; font-size: 1.2rem; color: var(--text-muted);
+}
+.cluster-header.open .chevron { transform: rotate(90deg); }
+.cluster-body {
+  max-height: 0; overflow: hidden;
+  transition: max-height 0.3s ease;
+}
+.cluster-body.open { max-height: 2000px; }
+
+.mass-card {
+  background: var(--white); padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+  transition: all 0.2s ease;
+}
+.mass-card:hover {
+  background: #fafbfc;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+.mass-card:last-child { border-bottom: none; }
+.mass-title { font-weight: 600; margin-bottom: 8px; font-size: 0.95rem; }
+
+.mass-format {
+  display: inline-block; padding: 3px 10px;
+  border-radius: 20px; font-size: 0.75rem; font-weight: 600;
+  margin-bottom: 8px;
+}
+.mass-format-online { background: rgba(21,101,192,0.1); color: var(--format-online); }
+.mass-format-mixed { background: rgba(106,27,154,0.1); color: var(--format-mixed); }
+.mass-format-inperson { background: rgba(230,81,0,0.1); color: var(--format-inperson); }
+
+.tags { display: flex; flex-wrap: wrap; gap: 6px; }
+.tag {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 3px 10px; border-radius: 20px;
+  font-size: 0.72rem; font-weight: 500;
+}
+.tag-required { background: var(--green-bg); color: var(--green); }
+.tag-optional { background: var(--bg); color: var(--text-muted); border: 1px solid var(--border); }
+.tag-dot { font-size: 0.55rem; }
+.mass-desc { font-size: 0.88rem; color: var(--text-muted); margin-bottom: 8px; line-height: 1.5; }
+.tag-legend { font-size: 0.78rem; color: var(--text-muted); margin-top: 20px; padding: 12px; background: var(--bg); border-radius: var(--radius-sm); line-height: 1.6; }
+
+/* No-measures message */
+.no-measures {
+  background: linear-gradient(135deg, #e8f5e9, #c8e6c9);
+  color: var(--green);
+  padding: 24px; border-radius: var(--radius);
+  text-align: center; font-weight: 600; margin-top: 16px;
+  box-shadow: var(--shadow-card);
+}
+
+/* ============================================
+   MASSNAHMEN-AUSWAHL (selectable cards)
+   ============================================ */
+.select-header {
+  text-align: center;
+  margin-bottom: 24px;
+}
+.select-header .prio-label {
+  display: inline-block;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--accent);
+  background: rgba(92,122,234,0.08);
+  padding: 2px 12px;
+  border-radius: 20px;
+  margin-bottom: 8px;
+}
+.select-header h2 { margin-bottom: 4px; }
+.select-hint {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  margin-top: 4px;
+}
+.mass-card-selectable {
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px 20px;
+  margin-bottom: 12px;
+  background: var(--white);
+  box-shadow: var(--shadow-card);
+  animation: cardSlideIn 0.35s ease both;
+}
+.mass-card-selectable:hover {
+  border-color: var(--accent);
+  box-shadow: var(--shadow-card-hover);
+  transform: translateY(-1px);
+}
+.mass-card-selectable.selected {
+  border-color: var(--primary);
+  background: rgba(46,64,87,0.04);
+  box-shadow: 0 0 0 2px var(--primary);
+  animation: likertBounce 0.3s ease;
+}
+.mass-card-selectable .mass-title { font-weight: 600; margin-bottom: 8px; font-size: 0.95rem; }
+.mass-card-selectable .mass-format { margin-bottom: 8px; }
+.mass-card-selectable.advancing { pointer-events: none; }
+
+/* ============================================
+   FOOTER
+   ============================================ */
+.footer-note {
+  margin-top: 40px; padding-top: 20px;
+  border-top: 1px solid var(--border);
+  font-size: 0.8rem; color: var(--text-muted);
+  text-align: center;
+  line-height: 1.6;
+}
+.footer-icon {
+  display: block;
+  margin: 0 auto 8px;
+  opacity: 0.4;
+}
+
+/* ============================================
+   PRINT
+   ============================================ */
+@media print {
+  body { background: white !important; }
+  .btn, .btn-group { display: none !important; }
+  .container { max-width: 100%; padding: 0; }
+  .screen { display: block !important; animation: none !important; opacity: 1 !important; transform: none !important; }
+  #screen-welcome, #screen-questionnaire, #screen-select { display: none !important; }
+  .cluster-body { max-height: none !important; overflow: visible !important; }
+  .hero-header { background: var(--primary) !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .chart-wrapper::before { display: none; }
+  .mass-card:hover { transform: none; box-shadow: none; }
+  .q-card { animation: none !important; }
+  .progress-fill::after { animation: none !important; }
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+@media (max-width: 480px) {
+  .container { padding: 16px 12px 32px; }
+  .hero-header { padding: 28px 20px 24px; }
+  .hero-title { font-size: 1.4rem; }
+  .hero-subtitle { font-size: 0.9rem; }
+  .welcome-box { padding: 20px 16px; }
+  .likert-btn { min-width: 46px; padding: 8px 2px; font-size: 0.78rem; }
+  .likert-label { display: none; }
+  .btn { padding: 10px 20px; font-size: 0.9rem; }
+  .btn-start { padding: 12px 28px; font-size: 0.95rem; }
+  .chart-legend-custom { gap: 10px; }
+}
+</style>
+</head>
+<body>
+<div class="container">
+
+<!-- SCREEN 1: Welcome -->
+<div id="screen-welcome" class="screen active">
+  <div class="hero-header">
+    <div class="hero-title-row">
+      <svg class="hero-icon" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M9 11l3 3L22 4"/>
+        <path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/>
+      </svg>
+      <h1 class="hero-title">Bedarfserhebung</h1>
+    </div>
+    <p class="hero-subtitle">Individualisierter Trainingsplan zur präventiven Belastungsreduktion</p>
+  </div>
+  <div class="welcome-box">
+    <p>Dieser Fragebogen dient dazu, Ihren individuellen Bedarf für einen präventiven Trainingsplan zu ermitteln. Er umfasst <strong>42 Aussagen</strong> zu verschiedenen persönlichen Ressourcen und Kompetenzen.</p>
+    <p>Bitte bewerten Sie jede Aussage danach, wie sehr sie auf Sie zutrifft. Es gibt keine richtigen oder falschen Antworten – antworten Sie so, wie es Ihrem aktuellen Erleben am besten entspricht.</p>
+    <p><strong>Bearbeitungszeit:</strong> ca. 7–10 Minuten</p>
+
+    <h3 style="margin-top:20px;">Antwortskala</h3>
+    <table class="scale-table">
+      <thead><tr><th>Wert</th><th>Bedeutung</th></tr></thead>
+      <tbody>
+        <tr><td>1</td><td>trifft gar nicht zu</td></tr>
+        <tr><td>2</td><td>trifft eher nicht zu</td></tr>
+        <tr><td>3</td><td>teils/teils</td></tr>
+        <tr><td>4</td><td>trifft eher zu</td></tr>
+        <tr><td>5</td><td>trifft voll zu</td></tr>
+      </tbody>
+    </table>
+
+    <div style="text-align:center; margin-top:24px;">
+      <button class="btn btn-start" onclick="startQuestionnaire()">Fragebogen starten</button>
+    </div>
+  </div>
+</div>
+
+<!-- SCREEN 2: Questionnaire -->
+<div id="screen-questionnaire" class="screen">
+  <h2>Fragebogen</h2>
+  <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
+  <div class="page-indicator" id="page-indicator"></div>
+  <div id="items-container"></div>
+  <div class="btn-group">
+    <button class="btn btn-secondary" id="btn-prev" onclick="prevItem()">Zurück</button>
+  </div>
+</div>
+
+<!-- SCREEN 3: Results -->
+<div id="screen-results" class="screen">
+  <h2>Ihre Ergebnisse</h2>
+  <p style="color:var(--text-muted); margin-bottom:4px;">Übersicht Ihrer Cluster-Scores mit Bedarfsstufen</p>
+  <div class="results-grid">
+    <div class="chart-wrapper">
+      <canvas id="radar-chart"></canvas>
+      <div class="chart-legend-custom" id="chart-legend"></div>
+    </div>
+    <div class="chart-wrapper">
+      <h3>Bedarfsstufen</h3>
+      <table class="ampel-table">
+        <thead><tr><th>Cluster</th><th>Score</th><th>Bedarf</th></tr></thead>
+        <tbody id="ampel-body"></tbody>
+      </table>
+    </div>
+  </div>
+  <div style="text-align:center; margin-top:24px;">
+    <button class="btn btn-primary" onclick="showMassnahmenSelect()">Massnahmen auswählen</button>
+  </div>
+</div>
+
+<!-- SCREEN 3b: Massnahmen-Auswahl -->
+<div id="screen-select" class="screen">
+  <div id="select-content"></div>
+</div>
+
+<!-- SCREEN 4: Zusammenfassung -->
+<div id="screen-massnahmen" class="screen">
+  <h2>Ihr individueller Trainingsplan</h2>
+  <p style="color:var(--text-muted); margin-bottom:4px;">Gesamtübersicht Ihrer Ergebnisse und empfohlenen Massnahmen</p>
+
+  <!-- Ergebnis-Übersicht mit Radar-Chart -->
+  <div class="results-grid" style="margin-bottom:24px;">
+    <div class="chart-wrapper">
+      <h3>Ihre Ergebnisse</h3>
+      <canvas id="summary-radar-chart"></canvas>
+      <div class="chart-legend-custom" id="summary-chart-legend"></div>
+    </div>
+  </div>
+
+  <!-- Massnahmen -->
+  <h3 style="margin-bottom:12px;">Empfohlene Massnahmen</h3>
+  <div id="massnahmen-container" class="massnahmen-section"></div>
+  <div class="btn-group" style="justify-content:center; gap:12px; flex-wrap:wrap;">
+    <button class="btn btn-secondary" onclick="showMassnahmenSelect()">Auswahl ändern</button>
+    <button class="btn btn-secondary" onclick="showScreen('screen-results')">Zurück zu Ergebnissen</button>
+    <button class="btn btn-secondary" onclick="window.print()">Drucken</button>
+    <button class="btn btn-primary" onclick="resetApp()">Neu starten</button>
+  </div>
+</div>
+
+<div class="footer-note">
+  <svg class="footer-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--text-muted)">
+    <path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/>
+    <path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/>
+  </svg>
+  Bedarfserhebung – Individualisierter Trainingsplan zur präventiven Belastungsreduktion bei organisationalem Wandel<br>
+  Masterarbeit, 2025
+</div>
+
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+// DATA
+// ═══════════════════════════════════════════════════════════════
+
+const ITEMS = [
+  { nr: 1, text: "Ich vertraue darauf, dass ich anspruchsvolle Aufgaben erfolgreich bewältigen kann." },
+  { nr: 2, text: "Ich lasse auch herausfordernde Gefühle und Gedanken zu." },
+  { nr: 3, text: "Ich nehme Sinneseindrücke in meinem Alltag bewusst wahr." },
+  { nr: 4, text: "Ich gehe verständnisvoll und warmherzig mit mir selbst um." },
+  { nr: 5, text: "In den letzten Wochen war ich häufig gut gelaunt." },
+  { nr: 6, text: "Nach einem Rückschlag erhole ich mich relativ schnell." },
+  { nr: 7, text: "Ich kann meine inneren Erfahrungen gut in Worte fassen." },
+  { nr: 8, text: "Wenn ein Weg versperrt ist, finde ich alternative Wege zu meinen Zielen." },
+  { nr: 9, text: "Ich fühle mich im Alltag energiegeladen und vital." },
+  { nr: 10, text: "Ich weiss, dass Herausforderungen und Rückschläge zum Menschsein gehören." },
+  { nr: 11, text: "Auch bei herausfordernden Gefühlen handle ich zielgerichtet." },
+  { nr: 12, text: "Ich finde gute Wege, um mit herausfordernden Situationen umzugehen." },
+  { nr: 13, text: "Ich nehme meine Emotionen bewusst wahr und lasse sie gelassen zu." },
+  { nr: 14, text: "Mein Alltag ist erfüllt von Dingen, die mich interessieren und begeistern." },
+  { nr: 15, text: "Ich kann meinen Stresspegel bewusst regulieren." },
+  { nr: 16, text: "Ich bin bei meinen täglichen Aktivitäten voll bei der Sache." },
+  { nr: 17, text: "Nach Rückschlägen finde ich wieder zu meiner vollen Leistungsfähigkeit zurück." },
+  { nr: 18, text: "Ich kann meine Gedanken aus einer gewissen Distanz betrachten." },
+  { nr: 19, text: "Ich passe mich gut an veränderte Umstände an." },
+  { nr: 20, text: "Mein Handeln orientiert sich an meinen persönlichen Werten." },
+  { nr: 21, text: "Ich kann meine Gefühle gut regulieren, auch in belastenden Momenten." },
+  { nr: 22, text: "Ich blicke zuversichtlich auf meine berufliche Zukunft." },
+  { nr: 23, text: "Ich begegne meinen Gedanken und Gefühlen mit einer akzeptierenden Haltung." },
+  { nr: 24, text: "Ich fühle mich ruhig und entspannt." },
+  { nr: 25, text: "Ich bin offen für neue Erfahrungen, auch wenn sie herausfordernd sind." },
+  { nr: 26, text: "Bei intensiven Empfindungen bleibe ich gelassen und besonnen." },
+  { nr: 27, text: "Ich verfolge meine Ziele konsequent und strukturiert." },
+  { nr: 28, text: "Auch in belastenden Situationen spüre ich eine innere Stärke." },
+  { nr: 29, text: "Ich empfinde Mitgefühl sowohl für mich selbst als auch für andere." },
+  { nr: 30, text: "Morgens wache ich ausgeruht und erholt auf." },
+  { nr: 31, text: "Ich bin im Alltag präsent und nehme den Moment bewusst wahr." },
+  { nr: 32, text: "Unter Druck bewahre ich Gelassenheit." },
+  { nr: 33, text: "Ich fühle mich körperlich wohl und fit." },
+  { nr: 34, text: "Im Arbeitsalltag kann ich Gefühle zulassen und gleichzeitig produktiv bleiben." },
+  { nr: 35, text: "Bei Problemen entwickle ich eigenständig Lösungsstrategien." },
+  { nr: 36, text: "Wenn mir etwas misslingt, akzeptiere ich mich trotzdem als Person." },
+  { nr: 37, text: "In meiner Freizeit gehe ich regelmässig Aktivitäten nach, die mir guttun." },
+  { nr: 38, text: "Ich bin in der Lage, mich gezielt zu entspannen." },
+  { nr: 39, text: "Ich ergreife aus eigenem Antrieb die Initiative, um Dinge zu verbessern." },
+  { nr: 40, text: "Ich betrachte meine Gedanken aus einer gewissen Distanz und lasse sie ziehen." },
+  { nr: 41, text: "Ich reagiere flexibel auf Veränderungen in meinem Umfeld." },
+  { nr: 42, text: "Ich lasse unterschiedliche Gefühle zu und gebe ihnen Raum." }
+];
+
+const CLUSTERS = [
+  { id: 1, name: "Achtsamkeit & Meditation",              items: [3,7,16,23,26,31,40], greenMin: 3.50, redBelow: 2.50 },
+  { id: 2, name: "Stressmanagement & Entspannung",        items: [6,12,15,19,28,32,38], greenMin: 4.00, redBelow: 3.00 },
+  { id: 3, name: "Verhaltenstherapeutische Ansätze",       items: [2,11,18,20,25,34,41], greenMin: 3.50, redBelow: 2.50 },
+  { id: 4, name: "Körperliche Aktivität & Wohlbefinden",   items: [5,9,14,24,30,33,37], greenMin: 3.50, redBelow: 2.50 },
+  { id: 5, name: "Selbstmanagement & Problemlösung",       items: [1,8,17,22,27,35,39], greenMin: 4.00, redBelow: 3.00 },
+  { id: 6, name: "Emotionale & Positive Kompetenzen",      items: [4,10,13,21,29,36,42], greenMin: 3.50, redBelow: 2.50 }
+];
+
+const LIKERT_LABELS = [
+  "trifft gar nicht zu",
+  "trifft eher nicht zu",
+  "teils/teils",
+  "trifft eher zu",
+  "trifft voll zu"
+];
+
+// Tags: ● = required, ○ = optional
+const TAG_LABELS = {
+  "RAUM": "Raum / Infrastruktur",
+  "TR_EXT": "Externer Trainer",
+  "BOOSTER": "Booster-Sessions",
+  "VERTR.": "Vertraulichkeit",
+  "LMS": "Lernplattform (LMS)",
+  "VIDEO": "Videoinhalte",
+  "ECOACH": "E-Coaching",
+  "APP": "App-Unterstützung"
+};
+
+const MASSNAHMEN = {
+  1: [
+    { title: "Betriebliche Achtsamkeitstrainings", format: "Mixed / In-person",
+      desc: "Präsenzbasierte Gruppentrainings mit Achtsamkeitsübungen, Body-Scans und Meditation im betrieblichen Umfeld.",
+      tags: [{t:"RAUM",r:true},{t:"TR_EXT",r:true},{t:"BOOSTER",r:false},{t:"VERTR.",r:true}] },
+    { title: "Achtsamkeitsbasierte Stressreduktion (MBSR)", format: "Mixed",
+      desc: "8-wöchiges strukturiertes Programm zur Stressreduktion durch Achtsamkeit nach Jon Kabat-Zinn.",
+      tags: [{t:"BOOSTER",r:false},{t:"VERTR.",r:true}] },
+    { title: "Digitale Achtsamkeits- & Meditationsprogramme", format: "Online",
+      desc: "Selbstgesteuertes Online-Training mit geführten Meditationen, Videos und App-gestützten Übungen.",
+      tags: [{t:"LMS",r:true},{t:"VIDEO",r:false},{t:"ECOACH",r:false},{t:"APP",r:false},{t:"BOOSTER",r:false},{t:"VERTR.",r:true}] },
+    { title: "Achtsamkeits-Kurzinterventionen", format: "Mixed",
+      desc: "Kompakte Einheiten (ca. 10–15 Min.), integrierbar in den Arbeitsalltag.",
+      tags: [{t:"RAUM",r:true},{t:"TR_EXT",r:true},{t:"BOOSTER",r:false},{t:"VERTR.",r:true}] }
+  ],
+  2: [
+    { title: "Digitale Stressmanagement-Programme", format: "Online",
+      desc: "Online-Training zur Stressbewältigung mit Selbstlernmodulen und optionaler App-Begleitung.",
+      tags: [{t:"LMS",r:true},{t:"VIDEO",r:false},{t:"APP",r:false},{t:"BOOSTER",r:false},{t:"VERTR.",r:true}] },
+    { title: "Entspannungsinterventionen", format: "Mixed",
+      desc: "Progressive Muskelrelaxation, Autogenes Training oder ähnliche Techniken in Gruppenform.",
+      tags: [{t:"RAUM",r:true},{t:"TR_EXT",r:true},{t:"BOOSTER",r:false},{t:"VERTR.",r:true}] },
+    { title: "Stressmanagement-Kurzinterventionen", format: "Mixed",
+      desc: "Kompakte Module, niederschwellig in den Arbeitsalltag integrierbar.",
+      tags: [{t:"BOOSTER",r:false},{t:"VERTR.",r:true}] },
+    { title: "VR-gestützte Entspannung", format: "In-person",
+      desc: "Entspannungstraining in Virtual-Reality-Umgebungen mit immersiven Naturszenarien.",
+      tags: [{t:"RAUM",r:true},{t:"TR_EXT",r:true},{t:"VIDEO",r:true},{t:"VERTR.",r:true}] }
+  ],
+  3: [
+    { title: "KVT-basierte digitale Programme", format: "Online",
+      desc: "Kognitive Verhaltenstherapie als Online-Selbsthilfe zur Veränderung dysfunktionaler Denkmuster.",
+      tags: [{t:"LMS",r:true},{t:"VIDEO",r:false},{t:"ECOACH",r:false},{t:"APP",r:false},{t:"BOOSTER",r:false},{t:"VERTR.",r:true}] },
+    { title: "ACT-basierte Online-Interventionen", format: "Online",
+      desc: "Akzeptanz- und Commitment-Übungen zur Förderung psychologischer Flexibilität.",
+      tags: [{t:"LMS",r:true},{t:"VIDEO",r:false},{t:"ECOACH",r:false},{t:"APP",r:false},{t:"BOOSTER",r:false},{t:"VERTR.",r:true}] }
+  ],
+  4: [
+    { title: "Betriebliche Bewegungsprogramme", format: "In-person Gruppe",
+      desc: "Regelmässige Gruppenaktivitäten wie Laufgruppen, Firmenfitness oder aktive Pausen.",
+      tags: [{t:"RAUM",r:true},{t:"TR_EXT",r:true},{t:"APP",r:false},{t:"BOOSTER",r:false},{t:"VERTR.",r:true}] },
+    { title: "Yoga-basierte Stressreduktion", format: "In-person Gruppe",
+      desc: "Yoga-Einheiten mit Körperübungen, Atemtechniken und Entspannung.",
+      tags: [{t:"RAUM",r:true},{t:"TR_EXT",r:true},{t:"VIDEO",r:false},{t:"APP",r:false},{t:"BOOSTER",r:false},{t:"VERTR.",r:true}] },
+    { title: "Kompensatorische Bewegungsprogramme", format: "In-person Gruppe",
+      desc: "Gezielte Übungen zum Ausgleich einseitiger Arbeitsbelastungen (z.B. langes Sitzen).",
+      tags: [{t:"RAUM",r:true},{t:"TR_EXT",r:true},{t:"APP",r:false},{t:"BOOSTER",r:false},{t:"VERTR.",r:true}] }
+  ],
+  5: [
+    { title: "Digitale Selbsthilfe-Programme", format: "Online",
+      desc: "Online-Module zur Stärkung von Selbstmanagement und persönlicher Zielorientierung.",
+      tags: [{t:"LMS",r:true},{t:"VIDEO",r:false},{t:"APP",r:false},{t:"BOOSTER",r:false},{t:"VERTR.",r:true}] },
+    { title: "Internetbasiertes Problemlösetraining", format: "Online",
+      desc: "Strukturiertes Online-Training zur systematischen Lösung beruflicher Herausforderungen.",
+      tags: [{t:"LMS",r:true},{t:"VIDEO",r:false},{t:"ECOACH",r:false},{t:"APP",r:false},{t:"BOOSTER",r:false},{t:"VERTR.",r:true}] }
+  ],
+  6: [
+    { title: "Positive Psychologie-Kurzinterventionen", format: "Online",
+      desc: "Übungen zur Förderung positiver Emotionen, Dankbarkeit und Stärkenorientierung.",
+      tags: [{t:"LMS",r:true},{t:"VIDEO",r:false},{t:"APP",r:false},{t:"BOOSTER",r:false},{t:"VERTR.",r:true}] }
+  ]
+};
+
+// ═══════════════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════════════
+
+let currentItem = 0;
+const answers = {};
+let radarChart = null;
+let summaryRadarChart = null;
+let advancing = false;
+
+// Massnahmen-Auswahl State
+let selectedMassnahmen = {};  // { clusterId: massnahmenIndex }
+let selectClusters = [];       // Top-2 Bedarfs-Cluster
+let selectStep = 0;            // 0 = Prio 1, 1 = Prio 2
+
+// ═══════════════════════════════════════════════════════════════
+// NAVIGATION
+// ═══════════════════════════════════════════════════════════════
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => {
+    s.classList.remove('active');
+    s.style.display = 'none';
+  });
+  const target = document.getElementById(id);
+  target.style.display = 'block';
+  // Trigger reflow before adding active class for animation
+  void target.offsetWidth;
+  target.classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function startQuestionnaire() {
+  currentItem = 0;
+  renderItem();
+  showScreen('screen-questionnaire');
+}
+
+// ═══════════════════════════════════════════════════════════════
+// QUESTIONNAIRE
+// ═══════════════════════════════════════════════════════════════
+
+function renderItem(direction) {
+  const item = ITEMS[currentItem];
+  const container = document.getElementById('items-container');
+
+  // Determine animation class
+  let animClass = '';
+  if (direction === 'forward') animClass = 'cardSlideIn';
+  else if (direction === 'back') animClass = 'slide-in-reverse';
+
+  container.innerHTML = `
+    <div class="q-card${answers[item.nr] ? ' answered' : ''}${animClass ? ' ' + animClass : ''}" id="card-${item.nr}">
+      <div class="q-number">Frage ${item.nr} / ${ITEMS.length}</div>
+      <div class="q-text">${item.text}</div>
+      <div class="likert-row">
+        ${[1,2,3,4,5].map(v => `
+          <button class="likert-btn ${answers[item.nr] === v ? 'selected' : ''}"
+                  onclick="selectAnswer(${item.nr}, ${v}, this)"
+                  type="button">
+            ${v}<span class="likert-label">${LIKERT_LABELS[v-1]}</span>
+          </button>
+        `).join('')}
+      </div>
+    </div>
+  `;
+
+  // Progress
+  const progress = ((currentItem + 1) / ITEMS.length) * 100;
+  document.getElementById('progress-fill').style.width = progress + '%';
+  document.getElementById('page-indicator').textContent =
+    `Frage ${currentItem + 1} von ${ITEMS.length}`;
+
+  // Back button
+  document.getElementById('btn-prev').style.visibility = currentItem === 0 ? 'hidden' : 'visible';
+}
+
+function selectAnswer(itemNr, value, btn) {
+  if (advancing) return;
+  answers[itemNr] = value;
+  const row = btn.parentElement;
+  row.querySelectorAll('.likert-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  const card = document.getElementById('card-' + itemNr);
+  card.classList.add('answered', 'advancing');
+
+  // Auto-advance after short delay
+  advancing = true;
+  setTimeout(() => {
+    advancing = false;
+    if (currentItem < ITEMS.length - 1) {
+      nextItem();
+    } else {
+      evaluate();
+    }
+  }, 400);
+}
+
+function nextItem() {
+  if (currentItem < ITEMS.length - 1) {
+    currentItem++;
+    renderItem('forward');
+  }
+}
+
+function prevItem() {
+  if (currentItem > 0) {
+    currentItem--;
+    renderItem('back');
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// EVALUATION
+// ═══════════════════════════════════════════════════════════════
+
+function computeScores() {
+  return CLUSTERS.map(c => {
+    const sum = c.items.reduce((s, nr) => s + (answers[nr] || 0), 0);
+    const score = sum / c.items.length;
+    let level;
+    if (score >= c.greenMin) level = 'green';
+    else if (score < c.redBelow) level = 'red';
+    else level = 'yellow';
+    return { ...c, score: Math.round(score * 100) / 100, level };
+  });
+}
+
+function evaluate() {
+  const scores = computeScores();
+  renderRadar(scores);
+  renderAmpelTable(scores);
+  showScreen('screen-results');
+}
+
+function renderRadar(scores) {
+  const ctx = document.getElementById('radar-chart').getContext('2d');
+  if (radarChart) radarChart.destroy();
+
+  const labels = scores.map(s => s.name);
+  const data = scores.map(s => s.score);
+  const pointColors = scores.map(s =>
+    s.level === 'green' ? '#2E7D32' : s.level === 'yellow' ? '#9C6500' : '#9C0006'
+  );
+
+  // Build threshold lines (per cluster)
+  const greenLine = scores.map(s => s.greenMin);
+  const redLine = scores.map(s => s.redBelow);
+
+  radarChart = new Chart(ctx, {
+    type: 'radar',
+    data: {
+      labels,
+      datasets: [
+        {
+          label: 'Ihr Score',
+          data,
+          backgroundColor: 'rgba(46,64,87,0.12)',
+          borderColor: '#2E4057',
+          borderWidth: 2.5,
+          pointBackgroundColor: pointColors,
+          pointBorderColor: '#fff',
+          pointBorderWidth: 2,
+          pointRadius: 7,
+          pointHoverRadius: 9
+        },
+        {
+          label: 'Kein Bedarf (Grenze)',
+          data: greenLine,
+          backgroundColor: 'transparent',
+          borderColor: '#2E7D32',
+          borderWidth: 1.5,
+          borderDash: [6, 4],
+          pointRadius: 0,
+          pointHoverRadius: 0
+        },
+        {
+          label: 'Hoher Bedarf (Grenze)',
+          data: redLine,
+          backgroundColor: 'transparent',
+          borderColor: '#9C0006',
+          borderWidth: 1.5,
+          borderDash: [6, 4],
+          pointRadius: 0,
+          pointHoverRadius: 0
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: true,
+      scales: {
+        r: {
+          min: 1,
+          max: 5,
+          ticks: { stepSize: 1, backdropColor: 'transparent', font: { size: 11, family: 'Inter' } },
+          grid: { color: 'rgba(0,0,0,0.06)' },
+          angleLines: { color: 'rgba(0,0,0,0.06)' },
+          pointLabels: { font: { size: 11, family: 'Inter', weight: '500' }, padding: 14 }
+        }
+      },
+      plugins: {
+        legend: { display: false }
+      }
+    }
+  });
+
+  // Custom legend
+  const legendEl = document.getElementById('chart-legend');
+  legendEl.innerHTML = `
+    <div class="legend-item"><span class="legend-dot" style="background:#2E4057;"></span> Ihr Score</div>
+    <div class="legend-item"><span class="legend-line" style="border-color:#2E7D32;"></span> Kein Bedarf</div>
+    <div class="legend-item"><span class="legend-line" style="border-color:#9C0006;"></span> Hoher Bedarf</div>
+  `;
+}
+
+function renderSummaryRadar(scores) {
+  const ctx = document.getElementById('summary-radar-chart').getContext('2d');
+  if (summaryRadarChart) summaryRadarChart.destroy();
+
+  const labels = scores.map(s => s.name);
+  const data = scores.map(s => s.score);
+  const pointColors = scores.map(s =>
+    s.level === 'green' ? '#2E7D32' : s.level === 'yellow' ? '#9C6500' : '#9C0006'
+  );
+  const greenLine = scores.map(s => s.greenMin);
+  const redLine = scores.map(s => s.redBelow);
+
+  summaryRadarChart = new Chart(ctx, {
+    type: 'radar',
+    data: {
+      labels,
+      datasets: [
+        {
+          label: 'Ihr Score',
+          data,
+          backgroundColor: 'rgba(46,64,87,0.12)',
+          borderColor: '#2E4057',
+          borderWidth: 2.5,
+          pointBackgroundColor: pointColors,
+          pointBorderColor: '#fff',
+          pointBorderWidth: 2,
+          pointRadius: 7,
+          pointHoverRadius: 9
+        },
+        {
+          label: 'Kein Bedarf (Grenze)',
+          data: greenLine,
+          backgroundColor: 'transparent',
+          borderColor: '#2E7D32',
+          borderWidth: 1.5,
+          borderDash: [6, 4],
+          pointRadius: 0,
+          pointHoverRadius: 0
+        },
+        {
+          label: 'Hoher Bedarf (Grenze)',
+          data: redLine,
+          backgroundColor: 'transparent',
+          borderColor: '#9C0006',
+          borderWidth: 1.5,
+          borderDash: [6, 4],
+          pointRadius: 0,
+          pointHoverRadius: 0
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: true,
+      scales: {
+        r: {
+          min: 1,
+          max: 5,
+          ticks: { stepSize: 1, backdropColor: 'transparent', font: { size: 11, family: 'Inter' } },
+          grid: { color: 'rgba(0,0,0,0.06)' },
+          angleLines: { color: 'rgba(0,0,0,0.06)' },
+          pointLabels: { font: { size: 11, family: 'Inter', weight: '500' }, padding: 14 }
+        }
+      },
+      plugins: {
+        legend: { display: false }
+      }
+    }
+  });
+
+  const legendEl = document.getElementById('summary-chart-legend');
+  legendEl.innerHTML = `
+    <div class="legend-item"><span class="legend-dot" style="background:#2E4057;"></span> Ihr Score</div>
+    <div class="legend-item"><span class="legend-line" style="border-color:#2E7D32;"></span> Kein Bedarf</div>
+    <div class="legend-item"><span class="legend-line" style="border-color:#9C0006;"></span> Hoher Bedarf</div>
+  `;
+}
+
+function renderAmpelTable(scores) {
+  const body = document.getElementById('ampel-body');
+  body.innerHTML = scores.map(s => {
+    const badgeClass = s.level === 'green' ? 'ampel-green' :
+                       s.level === 'yellow' ? 'ampel-yellow' : 'ampel-red';
+    const badgeText = s.level === 'green' ? 'Kein Bedarf' :
+                      s.level === 'yellow' ? 'Moderater Bedarf' : 'Hoher Bedarf';
+    const scoreClass = 'score-' + s.level;
+    return `<tr class="ampel-row-${s.level}">
+      <td>${s.name}</td>
+      <td class="score-val ${scoreClass}">${s.score.toFixed(2)}</td>
+      <td><span class="ampel-badge ${badgeClass}">${badgeText}</span></td>
+    </tr>`;
+  }).join('');
+}
+
+// ═══════════════════════════════════════════════════════════════
+// MASSNAHMEN
+// ═══════════════════════════════════════════════════════════════
+
+function getFormatClass(format) {
+  const f = format.toLowerCase();
+  if (f.includes('online') && !f.includes('in-person') && !f.includes('mixed')) return 'mass-format-online';
+  if (f.includes('mixed')) return 'mass-format-mixed';
+  return 'mass-format-inperson';
+}
+
+function showMassnahmenSelect() {
+  const scores = computeScores();
+  // Filter: only yellow/red, sort red first then by lowest score
+  const needClusters = scores
+    .filter(s => s.level !== 'green')
+    .sort((a, b) => {
+      if (a.level === 'red' && b.level !== 'red') return -1;
+      if (a.level !== 'red' && b.level === 'red') return 1;
+      return a.score - b.score;
+    });
+
+  const container = document.getElementById('massnahmen-container');
+
+  // Edge case: 0 clusters with need
+  if (needClusters.length === 0) {
+    container.innerHTML = '<div class="no-measures">Alle Cluster liegen im grünen Bereich. Kein spezifisches Training erforderlich – weiter so!</div>';
+    renderSummaryRadar(computeScores());
+    showScreen('screen-massnahmen');
+    return;
+  }
+
+  // Take top 2 (or 1 if only 1 exists)
+  selectClusters = needClusters.slice(0, 2);
+  selectedMassnahmen = {};
+  selectStep = 0;
+
+  // Auto-select clusters that have only 1 measure
+  selectClusters.forEach((s, idx) => {
+    const measures = MASSNAHMEN[s.id] || [];
+    if (measures.length === 1) {
+      selectedMassnahmen[s.id] = 0;
+    }
+  });
+
+  // Find first step that needs user input
+  while (selectStep < selectClusters.length && selectedMassnahmen[selectClusters[selectStep].id] !== undefined) {
+    selectStep++;
+  }
+
+  // If all auto-selected, go straight to summary
+  if (selectStep >= selectClusters.length) {
+    showMassnahmenSummary();
+    return;
+  }
+
+  renderSelectStep();
+  showScreen('screen-select');
+}
+
+function prevSelectStep() {
+  if (selectStep === 0) {
+    showScreen('screen-results');
+  } else {
+    selectStep--;
+    renderSelectStep();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+}
+
+function renderSelectStep() {
+  const cluster = selectClusters[selectStep];
+  const measures = MASSNAHMEN[cluster.id] || [];
+  const badgeClass = cluster.level === 'red' ? 'ampel-red' : 'ampel-yellow';
+  const badgeText = cluster.level === 'red' ? 'Hoher Bedarf' : 'Moderater Bedarf';
+  const prioNr = selectStep + 1;
+  const pct = ((selectStep + 1) / selectClusters.length) * 100;
+  const tagLegendItems = Object.entries(TAG_LABELS).map(([k,v]) => `${k} = ${v}`).join(', ');
+
+  const container = document.getElementById('select-content');
+  container.innerHTML = `
+    <div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>
+    <div class="page-indicator">Schritt ${selectStep + 1} von ${selectClusters.length}</div>
+    <div class="select-header">
+      <span class="prio-label">Priorität ${prioNr} von ${selectClusters.length}</span>
+      <h2>${cluster.name}</h2>
+      <span class="ampel-badge ${badgeClass}">${badgeText}</span>
+      <span style="margin-left:8px; color:var(--text-muted); font-size:0.9rem;">(Score: ${cluster.score.toFixed(2)})</span>
+      <p class="select-hint">Wählen Sie eine Massnahme für diesen Bereich:</p>
+    </div>
+    <div id="select-cards">
+      ${measures.map((m, idx) => `
+        <div class="mass-card-selectable" onclick="selectMassnahme(${cluster.id}, ${idx}, this)"
+             role="button" tabindex="0" aria-label="Massnahme: ${m.title}"
+             onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();selectMassnahme(${cluster.id}, ${idx}, this)}"
+             id="sel-card-${idx}">
+          <div class="mass-title">${m.title}</div>
+          ${m.desc ? `<p class="mass-desc">${m.desc}</p>` : ''}
+          <span class="mass-format ${getFormatClass(m.format)}">${m.format}</span>
+          <div class="tags">
+            ${m.tags.map(tag =>
+              `<span class="tag ${tag.r ? 'tag-required' : 'tag-optional'}" title="${TAG_LABELS[tag.t] || tag.t}">
+                <span class="tag-dot">${tag.r ? '●' : '○'}</span>${tag.t}
+              </span>`
+            ).join('')}
+          </div>
+        </div>
+      `).join('')}
+    </div>
+    <div class="btn-group">
+      <button class="btn btn-secondary" onclick="prevSelectStep()">Zurück</button>
+    </div>
+    <div class="tag-legend">
+      <strong>Legende:</strong> ● = erforderlich, ○ = optional — ${tagLegendItems}
+    </div>
+  `;
+}
+
+function selectMassnahme(clusterId, index, card) {
+  if (advancing) return;
+  selectedMassnahmen[clusterId] = index;
+
+  // Visual feedback
+  document.querySelectorAll('#select-cards .mass-card-selectable').forEach(c => c.classList.remove('selected'));
+  card.classList.add('selected');
+  card.classList.add('advancing');
+
+  // Auto-advance after delay
+  advancing = true;
+  setTimeout(() => {
+    advancing = false;
+    // Find next step that needs input
+    let nextStep = selectStep + 1;
+    while (nextStep < selectClusters.length && selectedMassnahmen[selectClusters[nextStep].id] !== undefined) {
+      nextStep++;
+    }
+
+    if (nextStep < selectClusters.length) {
+      selectStep = nextStep;
+      renderSelectStep();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } else {
+      showMassnahmenSummary();
+    }
+  }, 400);
+}
+
+function showMassnahmenSummary() {
+  const container = document.getElementById('massnahmen-container');
+  const tagLegendItems = Object.entries(TAG_LABELS).map(([k,v]) => `${k} = ${v}`).join(', ');
+
+  container.innerHTML = selectClusters.map((s, idx) => {
+    const badgeClass = s.level === 'red' ? 'ampel-red' : 'ampel-yellow';
+    const badgeText = s.level === 'red' ? 'Hoher Bedarf' : 'Moderater Bedarf';
+    const measures = MASSNAHMEN[s.id] || [];
+    const chosenIdx = selectedMassnahmen[s.id];
+    const m = measures[chosenIdx];
+    if (!m) return '';
+    const prioNr = idx + 1;
+
+    return `
+      <div class="cluster-group">
+        <div class="cluster-header cluster-header-${s.level === 'red' ? 'red' : 'yellow'} open" style="cursor:default;">
+          <span class="ampel-badge ${badgeClass}">Priorität ${prioNr}</span>
+          <h3>${s.name} <span style="font-weight:400;color:var(--text-muted);">(${s.score.toFixed(2)})</span></h3>
+        </div>
+        <div class="cluster-body open">
+          <div class="mass-card">
+            <div class="mass-title">${m.title}</div>
+            ${m.desc ? `<p class="mass-desc">${m.desc}</p>` : ''}
+            <span class="mass-format ${getFormatClass(m.format)}">${m.format}</span>
+            <div class="tags">
+              ${m.tags.map(tag =>
+                `<span class="tag ${tag.r ? 'tag-required' : 'tag-optional'}" title="${TAG_LABELS[tag.t] || tag.t}">
+                  <span class="tag-dot">${tag.r ? '●' : '○'}</span>${tag.t}
+                </span>`
+              ).join('')}
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('') + `
+    <div class="tag-legend">
+      <strong>Legende:</strong> ● = erforderlich, ○ = optional — ${tagLegendItems}
+    </div>
+  `;
+
+  renderSummaryRadar(computeScores());
+  showScreen('screen-massnahmen');
+}
+
+// ═══════════════════════════════════════════════════════════════
+// RIPPLE EFFECT
+// ═══════════════════════════════════════════════════════════════
+
+document.addEventListener('pointerdown', function(e) {
+  const btn = e.target.closest('.btn');
+  if (!btn) return;
+  const rect = btn.getBoundingClientRect();
+  btn.style.setProperty('--ripple-x', ((e.clientX - rect.left) / rect.width * 100) + '%');
+  btn.style.setProperty('--ripple-y', ((e.clientY - rect.top) / rect.height * 100) + '%');
+});
+
+// ═══════════════════════════════════════════════════════════════
+// RESET
+// ═══════════════════════════════════════════════════════════════
+
+function resetApp() {
+  Object.keys(answers).forEach(k => delete answers[k]);
+  currentItem = 0;
+  advancing = false;
+  selectedMassnahmen = {};
+  selectClusters = [];
+  selectStep = 0;
+  if (radarChart) { radarChart.destroy(); radarChart = null; }
+  if (summaryRadarChart) { summaryRadarChart.destroy(); summaryRadarChart = null; }
+  showScreen('screen-welcome');
+}
+</script>
+</body>
+</html>
