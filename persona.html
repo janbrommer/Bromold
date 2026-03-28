@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Bedarfserhebung – Individualisierter Trainingsplan</title>
+<title>Persona – Bedarfserhebung</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -49,7 +49,6 @@ body {
   min-height: 100vh;
 }
 
-/* Custom Scrollbar */
 ::-webkit-scrollbar { width: 8px; }
 ::-webkit-scrollbar-track { background: var(--bg); }
 ::-webkit-scrollbar-thumb { background: #b0bec5; border-radius: 4px; }
@@ -65,7 +64,6 @@ h1 { font-size: 1.5rem; color: var(--primary); margin-bottom: 8px; font-weight: 
 h2 { font-size: 1.25rem; color: var(--primary); margin-bottom: 12px; font-weight: 700; }
 h3 { font-size: 1.1rem; color: var(--primary); margin-bottom: 8px; font-weight: 600; }
 
-/* Screen Transitions */
 .screen { display: none; opacity: 0; transform: translateY(8px); }
 .screen.active {
   display: block;
@@ -77,7 +75,7 @@ h3 { font-size: 1.1rem; color: var(--primary); margin-bottom: 8px; font-weight: 
 }
 
 /* ============================================
-   WELCOME / HERO
+   HERO HEADER
    ============================================ */
 .hero-header {
   background: var(--primary-gradient);
@@ -103,10 +101,7 @@ h3 { font-size: 1.1rem; color: var(--primary); margin-bottom: 8px; font-weight: 
   gap: 12px;
   margin-bottom: 8px;
 }
-.hero-icon {
-  flex-shrink: 0;
-  opacity: 0.9;
-}
+.hero-icon { flex-shrink: 0; opacity: 0.9; }
 .hero-title {
   font-size: 1.75rem;
   font-weight: 700;
@@ -120,23 +115,19 @@ h3 { font-size: 1.1rem; color: var(--primary); margin-bottom: 8px; font-weight: 
   font-weight: 400;
   line-height: 1.5;
 }
-
-.welcome-box {
-  background: var(--white);
-  border-radius: 0 0 var(--radius) var(--radius);
-  padding: 32px 28px;
-  box-shadow: var(--shadow-elevated);
+.hero-nav {
+  display: flex;
+  gap: 16px;
+  margin-top: 12px;
 }
-.welcome-box p { margin-bottom: 12px; color: var(--text-muted); line-height: 1.7; }
-.scale-table { width: 100%; border-collapse: collapse; margin: 16px 0; }
-.scale-table th, .scale-table td {
-  padding: 8px 12px; text-align: left; border-bottom: 1px solid var(--border);
+.hero-nav a {
+  color: rgba(255,255,255,0.7);
+  text-decoration: none;
+  font-size: 0.85rem;
+  font-weight: 500;
+  transition: color 0.2s;
 }
-.scale-table th { background: var(--bg); font-weight: 600; font-size: 0.9rem; }
-.scale-table td:first-child {
-  font-weight: 700; width: 44px; text-align: center;
-  color: var(--primary);
-}
+.hero-nav a:hover { color: var(--white); }
 
 /* ============================================
    BUTTONS
@@ -147,16 +138,13 @@ h3 { font-size: 1.1rem; color: var(--primary); margin-bottom: 8px; font-weight: 
   font-family: 'Inter', sans-serif;
   font-size: 1rem; font-weight: 600; cursor: pointer;
   transition: all 0.2s ease;
-  position: relative;
-  overflow: hidden;
+  position: relative; overflow: hidden;
 }
 .btn::after {
   content: '';
-  position: absolute;
-  inset: 0;
+  position: absolute; inset: 0;
   background: radial-gradient(circle at var(--ripple-x, 50%) var(--ripple-y, 50%), rgba(255,255,255,0.3) 0%, transparent 60%);
-  opacity: 0;
-  transition: opacity 0.4s;
+  opacity: 0; transition: opacity 0.4s;
 }
 .btn:active::after { opacity: 1; transition: opacity 0s; }
 .btn:active { transform: scale(0.97); }
@@ -172,20 +160,6 @@ h3 { font-size: 1.1rem; color: var(--primary); margin-bottom: 8px; font-weight: 
 }
 .btn-primary:active { transform: scale(0.97) translateY(0); }
 
-.btn-start {
-  background: var(--accent-gradient);
-  color: var(--white);
-  box-shadow: 0 2px 12px rgba(92,122,234,0.3);
-  padding: 14px 36px;
-  font-size: 1.05rem;
-  border-radius: 10px;
-}
-.btn-start:hover {
-  box-shadow: 0 4px 20px rgba(92,122,234,0.45);
-  transform: translateY(-2px);
-}
-.btn-start:active { transform: scale(0.97) translateY(0); }
-
 .btn-secondary {
   background: var(--white);
   color: var(--text);
@@ -197,119 +171,108 @@ h3 { font-size: 1.1rem; color: var(--primary); margin-bottom: 8px; font-weight: 
   border-color: #ced4da;
   box-shadow: 0 2px 6px rgba(0,0,0,0.08);
 }
-
-.btn-group { display: flex; gap: 12px; margin-top: 24px; justify-content: center; }
-
-/* ============================================
-   PROGRESS BAR
-   ============================================ */
-.progress-bar {
-  width: 100%; height: 6px; background: var(--border);
-  border-radius: 3px; margin-bottom: 20px; overflow: hidden;
-}
-.progress-fill {
-  height: 100%;
-  background: linear-gradient(90deg, var(--primary), var(--accent));
-  border-radius: 3px;
-  transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  position: relative;
-}
-.progress-fill::after {
-  content: '';
-  position: absolute;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
-  animation: progressShimmer 2s infinite;
-}
-@keyframes progressShimmer {
-  0% { transform: translateX(-100%); }
-  100% { transform: translateX(100%); }
-}
-.page-indicator {
-  text-align: center; font-size: 0.85rem;
-  color: var(--text-muted); margin-bottom: 16px;
-  font-weight: 500;
-}
+.btn-group { display: flex; gap: 12px; margin-top: 24px; justify-content: center; flex-wrap: wrap; }
 
 /* ============================================
-   QUESTIONNAIRE ITEMS
+   PERSONA CARD
    ============================================ */
-.q-card {
+.persona-card {
   background: var(--white);
-  border-radius: var(--radius);
-  padding: 24px 24px;
-  margin-bottom: 12px;
-  box-shadow: var(--shadow-card);
-  border-left: 3px solid var(--border);
-  transition: box-shadow 0.2s, border-color 0.3s;
-  animation: cardSlideIn 0.35s ease both;
+  border-radius: 0 0 var(--radius) var(--radius);
+  padding: 28px;
+  box-shadow: var(--shadow-elevated);
+  margin-bottom: 24px;
 }
-
-@keyframes cardSlideIn {
-  from { opacity: 0; transform: translateX(30px); }
-  to { opacity: 1; transform: translateX(0); }
+.persona-top {
+  display: flex;
+  align-items: center;
+  gap: 20px;
 }
-.q-card.slide-out {
-  animation: cardSlideOut 0.2s ease both;
+.persona-avatar {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--white);
+  flex-shrink: 0;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
 }
-@keyframes cardSlideOut {
-  from { opacity: 1; transform: translateX(0); }
-  to { opacity: 0; transform: translateX(-30px); }
+.persona-info { flex: 1; }
+.persona-name {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin-bottom: 2px;
 }
-.q-card.slide-in-reverse {
-  animation: cardSlideInReverse 0.35s ease both;
+.persona-role {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  margin-bottom: 4px;
 }
-@keyframes cardSlideInReverse {
-  from { opacity: 0; transform: translateX(-30px); }
-  to { opacity: 1; transform: translateX(0); }
-}
-
-.q-card.answered { border-left-color: var(--green); }
-.q-card.unanswered { box-shadow: 0 0 0 2px var(--red-bg); border-left-color: var(--red); }
-
-.q-number {
+.persona-context {
   display: inline-block;
   font-size: 0.75rem;
   font-weight: 600;
-  color: var(--accent);
-  background: rgba(92,122,234,0.08);
-  padding: 2px 10px;
+  padding: 3px 10px;
   border-radius: 20px;
-  margin-bottom: 6px;
-}
-.q-text { font-size: 0.95rem; margin-bottom: 12px; font-weight: 500; line-height: 1.5; }
-.likert-row { display: flex; gap: 6px; flex-wrap: wrap; }
-.likert-btn {
-  flex: 1; min-width: 54px; padding: 10px 4px;
-  border: 2px solid var(--border); border-radius: 10px;
-  background: var(--white); cursor: pointer;
-  font-family: 'Inter', sans-serif;
-  font-size: 0.85rem; font-weight: 600; text-align: center;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  color: var(--text-muted);
-  line-height: 1.3;
-}
-.likert-btn:hover {
-  border-color: var(--accent);
+  background: rgba(92,122,234,0.08);
   color: var(--accent);
-  background: rgba(92,122,234,0.04);
 }
-.likert-btn.selected {
-  background: var(--primary);
-  color: var(--white);
-  border-color: var(--primary);
-  transform: scale(1.05);
-  box-shadow: 0 2px 8px rgba(46,64,87,0.25);
-  animation: likertBounce 0.3s ease;
+.persona-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 16px;
+  padding: 10px 0 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--primary);
+  transition: color 0.2s;
 }
-@keyframes likertBounce {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.1); }
-  100% { transform: scale(1.05); }
+.persona-toggle:hover { color: var(--accent); }
+.persona-toggle .chevron {
+  transition: transform 0.25s ease;
+  font-size: 0.8rem;
 }
-.likert-label { display: block; font-size: 0.68rem; margin-top: 3px; font-weight: 400; }
-/* Auto-advance: disable pointer events briefly after selection */
-.q-card.advancing .likert-btn { pointer-events: none; }
+.persona-toggle.open .chevron { transform: rotate(90deg); }
+.persona-desc {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.35s ease, padding 0.35s ease;
+  padding: 0;
+}
+.persona-desc.open {
+  max-height: 300px;
+  padding: 12px 0 0;
+}
+.persona-desc p {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  line-height: 1.7;
+}
+.persona-steckbrief {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 12px;
+  font-size: 0.85rem;
+}
+.persona-steckbrief td {
+  padding: 6px 12px;
+  border-bottom: 1px solid var(--border);
+}
+.persona-steckbrief td:first-child {
+  font-weight: 600;
+  color: var(--primary);
+  width: 140px;
+}
 
 /* ============================================
    RESULTS
@@ -323,8 +286,7 @@ h3 { font-size: 1.1rem; color: var(--primary); margin-bottom: 8px; font-weight: 
   border-radius: var(--radius);
   padding: 24px;
   box-shadow: var(--shadow-card);
-  position: relative;
-  overflow: hidden;
+  position: relative; overflow: hidden;
 }
 .chart-wrapper::before {
   content: '';
@@ -339,14 +301,11 @@ h3 { font-size: 1.1rem; color: var(--primary); margin-bottom: 8px; font-weight: 
 .ampel-table th {
   padding: 10px 12px; text-align: left;
   border-bottom: 2px solid var(--primary);
-  font-size: 0.85rem; color: var(--primary);
-  font-weight: 600;
+  font-size: 0.85rem; color: var(--primary); font-weight: 600;
 }
 .ampel-table td {
-  padding: 12px 12px; border-bottom: 1px solid var(--border);
-  font-size: 0.9rem;
+  padding: 12px 12px; border-bottom: 1px solid var(--border); font-size: 0.9rem;
 }
-.ampel-table tr { position: relative; }
 .ampel-table tr.ampel-row-green td { border-left: 3px solid var(--green); }
 .ampel-table tr.ampel-row-yellow td { border-left: 3px solid var(--yellow); }
 .ampel-table tr.ampel-row-red td { border-left: 3px solid var(--red); }
@@ -367,7 +326,6 @@ h3 { font-size: 1.1rem; color: var(--primary); margin-bottom: 8px; font-weight: 
 .score-val.score-yellow { color: var(--yellow); }
 .score-val.score-red { color: var(--red); }
 
-/* Legend */
 .chart-legend-custom {
   display: flex; flex-wrap: wrap; gap: 16px;
   justify-content: center;
@@ -405,12 +363,8 @@ h3 { font-size: 1.1rem; color: var(--primary); margin-bottom: 8px; font-weight: 
   cursor: pointer; user-select: none;
   transition: background 0.2s;
 }
-.cluster-header-red {
-  background: linear-gradient(135deg, #fff5f5, #ffffff);
-}
-.cluster-header-yellow {
-  background: linear-gradient(135deg, #fffbf0, #ffffff);
-}
+.cluster-header-red { background: linear-gradient(135deg, #fff5f5, #ffffff); }
+.cluster-header-yellow { background: linear-gradient(135deg, #fffbf0, #ffffff); }
 .cluster-header:hover { filter: brightness(0.98); }
 .cluster-header .ampel-badge { flex-shrink: 0; }
 .cluster-header h3 { margin: 0; flex: 1; font-size: 1rem; }
@@ -458,7 +412,6 @@ h3 { font-size: 1.1rem; color: var(--primary); margin-bottom: 8px; font-weight: 
 .mass-desc { font-size: 0.88rem; color: var(--text-muted); margin-bottom: 8px; line-height: 1.5; }
 .tag-legend { font-size: 0.78rem; color: var(--text-muted); margin-top: 20px; padding: 12px; background: var(--bg); border-radius: var(--radius-sm); line-height: 1.6; }
 
-/* No-measures message */
 .no-measures {
   background: linear-gradient(135deg, #e8f5e9, #c8e6c9);
   color: var(--green);
@@ -468,28 +421,12 @@ h3 { font-size: 1.1rem; color: var(--primary); margin-bottom: 8px; font-weight: 
 }
 
 /* ============================================
-   MASSNAHMEN-AUSWAHL (selectable cards)
+   MASSNAHMEN-AUSWAHL
    ============================================ */
-.select-header {
-  text-align: center;
-  margin-bottom: 24px;
-}
-.select-header .prio-label {
-  display: inline-block;
-  font-size: 0.75rem;
-  font-weight: 600;
-  color: var(--accent);
-  background: rgba(92,122,234,0.08);
-  padding: 2px 12px;
-  border-radius: 20px;
-  margin-bottom: 8px;
-}
+.select-header { text-align: center; margin-bottom: 24px; }
 .select-header h2 { margin-bottom: 4px; }
-.select-hint {
-  color: var(--text-muted);
-  font-size: 0.9rem;
-  margin-top: 4px;
-}
+.select-hint { color: var(--text-muted); font-size: 0.9rem; margin-top: 4px; }
+
 .mass-card-selectable {
   cursor: pointer;
   transition: all 0.2s ease;
@@ -499,7 +436,6 @@ h3 { font-size: 1.1rem; color: var(--primary); margin-bottom: 8px; font-weight: 
   margin-bottom: 12px;
   background: var(--white);
   box-shadow: var(--shadow-card);
-  animation: cardSlideIn 0.35s ease both;
 }
 .mass-card-selectable:hover {
   border-color: var(--accent);
@@ -510,11 +446,9 @@ h3 { font-size: 1.1rem; color: var(--primary); margin-bottom: 8px; font-weight: 
   border-color: var(--primary);
   background: rgba(46,64,87,0.04);
   box-shadow: 0 0 0 2px var(--primary);
-  animation: likertBounce 0.3s ease;
 }
 .mass-card-selectable .mass-title { font-weight: 600; margin-bottom: 8px; font-size: 0.95rem; }
 .mass-card-selectable .mass-format { margin-bottom: 8px; }
-.mass-card-selectable.advancing { pointer-events: none; }
 .mass-card-selectable.disabled {
   opacity: 0.45;
   pointer-events: none;
@@ -522,13 +456,7 @@ h3 { font-size: 1.1rem; color: var(--primary); margin-bottom: 8px; font-weight: 
   border-color: var(--border);
   background: #f8f8f8;
 }
-.mass-card-selectable.disabled:hover {
-  transform: none;
-  box-shadow: var(--shadow-card);
-  border-color: var(--border);
-}
 
-/* Time badge on cards */
 .time-badge {
   display: inline-block;
   font-size: 0.72rem;
@@ -541,7 +469,6 @@ h3 { font-size: 1.1rem; color: var(--primary); margin-bottom: 8px; font-weight: 
   vertical-align: middle;
 }
 
-/* Time budget bar */
 .time-budget-header {
   background: var(--white);
   border: 1px solid var(--border);
@@ -575,7 +502,6 @@ h3 { font-size: 1.1rem; color: var(--primary); margin-bottom: 8px; font-weight: 
   font-weight: 500;
 }
 
-/* Section dividers for hoch/moderat */
 .section-divider {
   font-size: 0.85rem;
   font-weight: 700;
@@ -596,7 +522,6 @@ h3 { font-size: 1.1rem; color: var(--primary); margin-bottom: 8px; font-weight: 
 .section-divider-red { color: var(--red); }
 .section-divider-yellow { color: var(--yellow); }
 
-/* Cluster sub-header in selection */
 .select-cluster-header {
   font-size: 0.95rem;
   font-weight: 600;
@@ -609,7 +534,6 @@ h3 { font-size: 1.1rem; color: var(--primary); margin-bottom: 8px; font-weight: 
 .select-cluster-header .ampel-badge { font-size: 0.72rem; }
 .select-cluster-header .cluster-score { font-weight: 400; color: var(--text-muted); font-size: 0.85rem; }
 
-/* Disabled tooltip */
 .disabled-hint {
   display: block;
   font-size: 0.78rem;
@@ -643,13 +567,12 @@ h3 { font-size: 1.1rem; color: var(--primary); margin-bottom: 8px; font-weight: 
   .btn, .btn-group { display: none !important; }
   .container { max-width: 100%; padding: 0; }
   .screen { display: block !important; animation: none !important; opacity: 1 !important; transform: none !important; }
-  #screen-welcome, #screen-questionnaire, #screen-select { display: none !important; }
+  #screen-select { display: none !important; }
   .cluster-body { max-height: none !important; overflow: visible !important; }
   .hero-header { background: var(--primary) !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
   .chart-wrapper::before { display: none; }
   .mass-card:hover { transform: none; box-shadow: none; }
-  .q-card { animation: none !important; }
-  .progress-fill::after { animation: none !important; }
+  .hero-nav { display: none !important; }
 }
 
 /* ============================================
@@ -660,11 +583,11 @@ h3 { font-size: 1.1rem; color: var(--primary); margin-bottom: 8px; font-weight: 
   .hero-header { padding: 28px 20px 24px; }
   .hero-title { font-size: 1.4rem; }
   .hero-subtitle { font-size: 0.9rem; }
-  .welcome-box { padding: 20px 16px; }
-  .likert-btn { min-width: 46px; padding: 8px 2px; font-size: 0.78rem; }
-  .likert-label { display: none; }
+  .persona-card { padding: 20px 16px; }
+  .persona-top { gap: 14px; }
+  .persona-avatar { width: 60px; height: 60px; font-size: 1.5rem; }
+  .persona-name { font-size: 1.1rem; }
   .btn { padding: 10px 20px; font-size: 0.9rem; }
-  .btn-start { padding: 12px 28px; font-size: 0.95rem; }
   .chart-legend-custom { gap: 10px; }
 }
 </style>
@@ -672,59 +595,43 @@ h3 { font-size: 1.1rem; color: var(--primary); margin-bottom: 8px; font-weight: 
 <body>
 <div class="container">
 
-<!-- SCREEN 1: Welcome -->
-<div id="screen-welcome" class="screen active">
+<!-- SCREEN 1: Persona + Results -->
+<div id="screen-results" class="screen active">
   <div class="hero-header">
     <div class="hero-title-row">
       <svg class="hero-icon" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M9 11l3 3L22 4"/>
-        <path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/>
+        <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/>
+        <circle cx="12" cy="7" r="4"/>
       </svg>
-      <h1 class="hero-title">Bedarfserhebung</h1>
+      <h1 class="hero-title">Persona-Ansicht</h1>
     </div>
-    <p class="hero-subtitle">Individualisierter Trainingsplan zur präventiven Belastungsreduktion</p>
-  </div>
-  <div class="welcome-box">
-    <p>Dieser Fragebogen dient dazu, Ihren individuellen Bedarf für einen präventiven Trainingsplan zu ermitteln. Er umfasst <strong>42 Aussagen</strong> zu verschiedenen persönlichen Ressourcen und Kompetenzen.</p>
-    <p>Bitte bewerten Sie jede Aussage danach, wie sehr sie auf Sie zutrifft. Es gibt keine richtigen oder falschen Antworten – antworten Sie so, wie es Ihrem aktuellen Erleben am besten entspricht.</p>
-    <p><strong>Bearbeitungszeit:</strong> ca. 7–10 Minuten</p>
-
-    <h3 style="margin-top:20px;">Antwortskala</h3>
-    <table class="scale-table">
-      <thead><tr><th>Wert</th><th>Bedeutung</th></tr></thead>
-      <tbody>
-        <tr><td>1</td><td>trifft gar nicht zu</td></tr>
-        <tr><td>2</td><td>trifft eher nicht zu</td></tr>
-        <tr><td>3</td><td>teils/teils</td></tr>
-        <tr><td>4</td><td>trifft eher zu</td></tr>
-        <tr><td>5</td><td>trifft voll zu</td></tr>
-      </tbody>
-    </table>
-
-    <div style="text-align:center; margin-top:24px;">
-      <button class="btn btn-start" onclick="startQuestionnaire()">Fragebogen starten</button>
-    </div>
-    <div style="text-align:center; margin-top:12px;">
-      <a href="admin.html" style="color:var(--text-muted); font-size:0.85rem; text-decoration:none; font-weight:500; transition:color 0.2s;" onmouseover="this.style.color='var(--primary)'" onmouseout="this.style.color='var(--text-muted)'">&rarr; Zur Verwaltung / Personas</a>
+    <p class="hero-subtitle" id="hero-subtitle">Beispielhaft ausgefüllte Bedarfserhebung</p>
+    <div class="hero-nav">
+      <a href="admin.html">&larr; Zur Verwaltung</a>
+      <a href="index.html">Zur Bedarfserhebung</a>
     </div>
   </div>
-</div>
 
-<!-- SCREEN 2: Questionnaire -->
-<div id="screen-questionnaire" class="screen">
-  <h2>Fragebogen</h2>
-  <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
-  <div class="page-indicator" id="page-indicator"></div>
-  <div id="items-container"></div>
-  <div class="btn-group">
-    <button class="btn btn-secondary" id="btn-prev" onclick="prevItem()">Zurück</button>
+  <div class="persona-card">
+    <div class="persona-top">
+      <div class="persona-avatar" id="persona-avatar">S</div>
+      <div class="persona-info">
+        <div class="persona-name" id="persona-name">Sabine Meier</div>
+        <div class="persona-role" id="persona-role">Teamleiterin Finanzen & Controlling</div>
+        <span class="persona-context" id="persona-context">Betriebliches Gesundheitsmanagement</span>
+      </div>
+    </div>
+    <button class="persona-toggle" id="persona-toggle" onclick="togglePersonaDesc()">
+      <span class="chevron">&#9654;</span> Beschreibung anzeigen
+    </button>
+    <div class="persona-desc" id="persona-desc">
+      <p id="persona-desc-text"></p>
+      <table class="persona-steckbrief" id="persona-steckbrief"></table>
+    </div>
   </div>
-</div>
 
-<!-- SCREEN 3: Results -->
-<div id="screen-results" class="screen">
-  <h2>Ihre Ergebnisse</h2>
-  <p style="color:var(--text-muted); margin-bottom:4px;">Übersicht Ihrer Cluster-Scores mit Bedarfsstufen</p>
+  <h2>Ergebnisse</h2>
+  <p style="color:var(--text-muted); margin-bottom:4px;">Cluster-Scores mit Bedarfsstufen</p>
   <div class="results-grid">
     <div class="chart-wrapper">
       <canvas id="radar-chart"></canvas>
@@ -743,33 +650,30 @@ h3 { font-size: 1.1rem; color: var(--primary); margin-bottom: 8px; font-weight: 
   </div>
 </div>
 
-<!-- SCREEN 3b: Massnahmen-Auswahl -->
+<!-- SCREEN 2: Massnahmen-Auswahl -->
 <div id="screen-select" class="screen">
   <div id="select-content"></div>
 </div>
 
-<!-- SCREEN 4: Zusammenfassung -->
+<!-- SCREEN 3: Zusammenfassung -->
 <div id="screen-massnahmen" class="screen">
-  <h2>Ihr individueller Trainingsplan</h2>
-  <p style="color:var(--text-muted); margin-bottom:4px;">Gesamtübersicht Ihrer Ergebnisse und empfohlenen Massnahmen</p>
+  <h2>Individueller Trainingsplan</h2>
+  <p style="color:var(--text-muted); margin-bottom:4px;">Gesamtübersicht der Ergebnisse und empfohlenen Massnahmen</p>
 
-  <!-- Ergebnis-Übersicht mit Radar-Chart -->
   <div class="results-grid" style="margin-bottom:24px;">
     <div class="chart-wrapper">
-      <h3>Ihre Ergebnisse</h3>
+      <h3>Ergebnisse</h3>
       <canvas id="summary-radar-chart"></canvas>
       <div class="chart-legend-custom" id="summary-chart-legend"></div>
     </div>
   </div>
 
-  <!-- Massnahmen -->
   <h3 style="margin-bottom:12px;">Empfohlene Massnahmen</h3>
   <div id="massnahmen-container" class="massnahmen-section"></div>
   <div class="btn-group" style="justify-content:center; gap:12px; flex-wrap:wrap;">
     <button class="btn btn-secondary" onclick="showMassnahmenSelect()">Auswahl ändern</button>
     <button class="btn btn-secondary" onclick="showScreen('screen-results')">Zurück zu Ergebnissen</button>
     <button class="btn btn-secondary" onclick="window.print()">Drucken</button>
-    <button class="btn btn-primary" onclick="resetApp()">Neu starten</button>
   </div>
 </div>
 
@@ -786,53 +690,81 @@ h3 { font-size: 1.1rem; color: var(--primary); margin-bottom: 8px; font-weight: 
 
 <script>
 // ═══════════════════════════════════════════════════════════════
-// DATA
+// PERSONA DATA
 // ═══════════════════════════════════════════════════════════════
 
-const ITEMS = [
-  { nr: 1, text: "Ich vertraue darauf, dass ich anspruchsvolle Aufgaben erfolgreich bewältigen kann." },
-  { nr: 2, text: "Ich lasse auch herausfordernde Gefühle und Gedanken zu." },
-  { nr: 3, text: "Ich nehme Sinneseindrücke in meinem Alltag bewusst wahr." },
-  { nr: 4, text: "Ich gehe verständnisvoll und warmherzig mit mir selbst um." },
-  { nr: 5, text: "Ich führe regelmässig körperlich anstrengende Aktivitäten aus (z. B. Joggen, intensives Training, schwere körperliche Arbeit)." },
-  { nr: 6, text: "Nach einem Rückschlag erhole ich mich relativ schnell." },
-  { nr: 7, text: "Ich kann meine inneren Erfahrungen gut in Worte fassen." },
-  { nr: 8, text: "Wenn ein Weg versperrt ist, finde ich alternative Wege zu meinen Zielen." },
-  { nr: 9, text: "Ich bin regelmässig körperlich aktiv mit mittlerer Anstrengung (z. B. zügiges Radfahren, Gartenarbeit, Schwimmen)." },
-  { nr: 10, text: "Ich weiss, dass Herausforderungen und Rückschläge zum Menschsein gehören." },
-  { nr: 11, text: "Auch bei herausfordernden Gefühlen handle ich zielgerichtet." },
-  { nr: 12, text: "Ich finde gute Wege, um mit herausfordernden Situationen umzugehen." },
-  { nr: 13, text: "Ich nehme meine Emotionen bewusst wahr und lasse sie gelassen zu." },
-  { nr: 14, text: "Ich integriere Bewegung bewusst in meinen Alltag (z. B. zu Fuss gehen, Treppen steigen, Spaziergänge)." },
-  { nr: 15, text: "Ich kann meinen Stresspegel bewusst regulieren." },
-  { nr: 16, text: "Ich bin bei meinen täglichen Aktivitäten voll bei der Sache." },
-  { nr: 17, text: "Nach Rückschlägen finde ich wieder zu meiner vollen Leistungsfähigkeit zurück." },
-  { nr: 18, text: "Ich kann meine Gedanken aus einer gewissen Distanz betrachten." },
-  { nr: 19, text: "Ich passe mich gut an veränderte Umstände an." },
-  { nr: 20, text: "Mein Handeln orientiert sich an meinen persönlichen Werten." },
-  { nr: 21, text: "Ich kann meine Gefühle gut regulieren, auch in belastenden Momenten." },
-  { nr: 22, text: "Ich blicke zuversichtlich auf meine berufliche Zukunft." },
-  { nr: 23, text: "Ich begegne meinen Gedanken und Gefühlen mit einer akzeptierenden Haltung." },
-  { nr: 24, text: "Ich achte darauf, längeres ununterbrochenes Sitzen im Alltag zu vermeiden." },
-  { nr: 25, text: "Ich bin offen für neue Erfahrungen, auch wenn sie herausfordernd sind." },
-  { nr: 26, text: "Bei intensiven Empfindungen bleibe ich gelassen und besonnen." },
-  { nr: 27, text: "Ich verfolge meine Ziele konsequent und strukturiert." },
-  { nr: 28, text: "Auch in belastenden Situationen spüre ich eine innere Stärke." },
-  { nr: 29, text: "Ich empfinde Mitgefühl sowohl für mich selbst als auch für andere." },
-  { nr: 30, text: "Ich habe eine feste Routine für körperliche Aktivität in meiner Woche." },
-  { nr: 31, text: "Ich bin im Alltag präsent und nehme den Moment bewusst wahr." },
-  { nr: 32, text: "Unter Druck bewahre ich Gelassenheit." },
-  { nr: 33, text: "Ich fühle mich körperlich fit und leistungsfähig." },
-  { nr: 34, text: "Im Arbeitsalltag kann ich Gefühle zulassen und gleichzeitig produktiv bleiben." },
-  { nr: 35, text: "Bei Problemen entwickle ich eigenständig Lösungsstrategien." },
-  { nr: 36, text: "Wenn mir etwas misslingt, akzeptiere ich mich trotzdem als Person." },
-  { nr: 37, text: "In meiner Freizeit nutze ich Bewegung gezielt zur Erholung und zum Ausgleich." },
-  { nr: 38, text: "Ich bin in der Lage, mich gezielt zu entspannen." },
-  { nr: 39, text: "Ich ergreife aus eigenem Antrieb die Initiative, um Dinge zu verbessern." },
-  { nr: 40, text: "Ich betrachte meine Gedanken aus einer gewissen Distanz und lasse sie ziehen." },
-  { nr: 41, text: "Ich reagiere flexibel auf Veränderungen in meinem Umfeld." },
-  { nr: 42, text: "Ich lasse unterschiedliche Gefühle zu und gebe ihnen Raum." }
-];
+const PERSONAS = {
+  sabine: {
+    name: "Sabine Meier",
+    role: "Teamleiterin Finanzen & Controlling",
+    context: "Betriebliches Gesundheitsmanagement",
+    avatarColor: "#5C7AEA",
+    initial: "SM",
+    steckbrief: {
+      "Alter": "46 Jahre",
+      "Funktion": "Teamleiterin Finanzen & Controlling",
+      "Branche": "Versicherungsunternehmen (Büro/Unternehmen)",
+      "Berufserfahrung": "22 Jahre, davon 8 Jahre in Führungsposition",
+      "Einsatzkontext": "Kein aktueller Veränderungsprozess; Fragebogen im Rahmen des betrieblichen Gesundheitsmanagements (BGM)"
+    },
+    description: "Sabine ist eine erfahrene Führungskraft, die ihr Team seit Jahren erfolgreich leitet. Ihr Unternehmen bietet den Trainingsplan als Teil des betrieblichen Gesundheitsmanagements an – unabhängig von konkreten Veränderungsprojekten. Sabine ist lösungsorientiert, strukturiert und verfügt über ein starkes Selbstmanagement. Allerdings vernachlässigt sie ihre körperliche Gesundheit: Lange Bürotage, keine regelmässige Bewegung und durchgearbeitete Mittagspausen sind bei ihr die Regel. Achtsamkeit und Selbstreflexion betrachtet sie als «nettes Extra», nimmt sich aber kaum Zeit dafür. Emotional hält sie sich für belastbar, unterschätzt jedoch, dass sie zunehmend Mühe hat, ihre Gefühle bewusst wahrzunehmen und zu regulieren.",
+    answers: {
+      1:4, 2:4, 3:3, 4:3, 5:1, 6:3, 7:3, 8:5, 9:2, 10:4,
+      11:4, 12:4, 13:3, 14:3, 15:3, 16:4, 17:4, 18:3, 19:4, 20:4,
+      21:3, 22:4, 23:2, 24:2, 25:4, 26:3, 27:4, 28:3, 29:3, 30:1,
+      31:3, 32:4, 33:3, 34:4, 35:4, 36:3, 37:3, 38:3, 39:4, 40:3,
+      41:3, 42:3
+    }
+  },
+  marco: {
+    name: "Marco Bianchi",
+    role: "Junior Projektmanager",
+    context: "Reorganisation angekündigt (präventiv)",
+    avatarColor: "#E65100",
+    initial: "MB",
+    steckbrief: {
+      "Alter": "28 Jahre",
+      "Funktion": "Junior Projektmanager",
+      "Branche": "IT-Dienstleistungsunternehmen (Büro/Unternehmen)",
+      "Berufserfahrung": "4 Jahre, erste Stelle nach dem Studium",
+      "Einsatzkontext": "Reorganisation der Abteilung angekündigt, aber noch nicht gestartet; Trainingsplan wird präventiv zur Vorbereitung eingesetzt"
+    },
+    description: "Marco ist ein sportlicher junger Berufseinsteiger, der mehrmals wöchentlich ins Fitnessstudio geht und am Wochenende Mountainbike fährt. Körperlich fühlt er sich fit und leistungsfähig. Vor zwei Wochen wurde in seinem Unternehmen eine Reorganisation mit neuer Teamstruktur und Rollenänderungen angekündigt – konkrete Auswirkungen sind noch nicht spürbar, aber die Unsicherheit ist bereits da. Sein Vorgesetzter hat dem Team den Fragebogen empfohlen, um sich frühzeitig auf die kommende Veränderung vorzubereiten. Marco neigt generell dazu, sich von Stress überwältigen zu lassen und findet keinen guten Umgang mit belastenden Gefühlen. Achtsamkeit und Selbstreflexion sind für ihn Fremdwörter – er «funktioniert» einfach. Emotional reagiert er impulsiv und ist sich seiner Gefühlswelt wenig bewusst. Wenn Dinge schiefgehen, beschäftigt ihn das übermässig lange und er hinterfragt sich als Person.",
+    answers: {
+      1:3, 2:3, 3:2, 4:2, 5:5, 6:3, 7:2, 8:3, 9:4, 10:3,
+      11:2, 12:3, 13:2, 14:4, 15:2, 16:3, 17:3, 18:3, 19:3, 20:4,
+      21:2, 22:4, 23:2, 24:4, 25:3, 26:2, 27:3, 28:2, 29:3, 30:4,
+      31:3, 32:3, 33:4, 34:3, 35:4, 36:2, 37:4, 38:3, 39:3, 40:2,
+      41:3, 42:2
+    }
+  },
+  lena: {
+    name: "Lena Hofstetter",
+    role: "Sachbearbeiterin Personal- und Organisationsentwicklung",
+    context: "Laufendes Digitalisierungsprojekt",
+    avatarColor: "#2E7D32",
+    initial: "LH",
+    steckbrief: {
+      "Alter": "38 Jahre",
+      "Funktion": "Sachbearbeiterin Personal- und Organisationsentwicklung",
+      "Branche": "Kantonale Verwaltung (Büro/Verwaltung)",
+      "Berufserfahrung": "14 Jahre, davon 10 Jahre in der aktuellen Stelle",
+      "Einsatzkontext": "Laufendes Digitalisierungsprojekt mit Einführung neuer Self-Service-Prozesse; Trainingsplan wird begleitend während des Changes eingesetzt"
+    },
+    description: "Lena ist eine reflektierte, empathische Mitarbeiterin, die regelmässig Yoga praktiziert und sich seit Jahren mit Achtsamkeit und emotionaler Selbstfürsorge beschäftigt. Sie hat ein feines Gespür für ihre eigenen Emotionen und die ihrer Kolleginnen und Kollegen. Im Umgang mit Stress zeigt sie sich resilient und gelassen. Seit einigen Monaten läuft in ihrer Abteilung ein Digitalisierungsprojekt, das ihre Arbeitsabläufe grundlegend verändert. Ihre Vorgesetzte hat den Trainingsplan begleitend zum Change-Prozess eingeführt. Lena hadert mit der Veränderung: Sie fühlt sich fachlich überfordert, traut sich wenig zu und vermeidet es, eigenständig Entscheidungen zu treffen. Sie wartet lieber auf Anweisungen, statt selbst die Initiative zu ergreifen. Ihre körperliche Aktivität beschränkt sich auf die Yoga-Stunden – darüber hinaus bewegt sie sich wenig und sitzt den grössten Teil des Tages.",
+    answers: {
+      1:3, 2:4, 3:4, 4:4, 5:2, 6:4, 7:4, 8:2, 9:3, 10:4,
+      11:3, 12:4, 13:4, 14:4, 15:4, 16:4, 17:3, 18:4, 19:5, 20:3,
+      21:4, 22:2, 23:4, 24:3, 25:3, 26:3, 27:3, 28:4, 29:4, 30:2,
+      31:4, 32:4, 33:3, 34:3, 35:3, 36:4, 37:4, 38:4, 39:3, 40:4,
+      41:3, 42:4
+    }
+  }
+};
+
+// ═══════════════════════════════════════════════════════════════
+// APP DATA (mirrored from index.html)
+// ═══════════════════════════════════════════════════════════════
 
 const CLUSTERS = [
   { id: 1, name: "Achtsamkeit & Meditation",              items: [3,7,16,23,26,31,40], greenMin: 3.50, redBelow: 2.50 },
@@ -843,15 +775,6 @@ const CLUSTERS = [
   { id: 6, name: "Emotionale & Positive Kompetenzen",      items: [4,10,13,21,29,36,42], greenMin: 3.50, redBelow: 2.50 }
 ];
 
-const LIKERT_LABELS = [
-  "trifft gar nicht zu",
-  "trifft eher nicht zu",
-  "teils/teils",
-  "trifft eher zu",
-  "trifft voll zu"
-];
-
-// Tags: ● = required, ○ = optional
 const TAG_LABELS = {
   "RAUM": "Raum / Infrastruktur",
   "TR_EXT": "Externer Trainer",
@@ -930,15 +853,11 @@ const MASSNAHMEN = {
 // STATE
 // ═══════════════════════════════════════════════════════════════
 
-let currentItem = 0;
-const answers = {};
+let answers = {};
 let radarChart = null;
 let summaryRadarChart = null;
-let advancing = false;
-
-// Massnahmen-Auswahl State
-let selectedMassnahmen = new Set();  // Set of "clusterId-index" keys
-let selectClusters = [];       // All Bedarfs-Cluster (red + yellow)
+let selectedMassnahmen = new Set();
+let selectClusters = [];
 let timeUsed = 0;
 let maxMinPerWeek = 120;
 
@@ -956,7 +875,7 @@ function getActiveMassnahmen(clusterId) {
         return all.filter((_, i) => cfg[clusterId][i] !== false);
       }
     }
-  } catch (e) { /* fallback: all active */ }
+  } catch (e) {}
   return all;
 }
 
@@ -967,7 +886,7 @@ function getMaxMinPerWeek() {
       const cfg = JSON.parse(raw);
       if (cfg.maxMinPerWeek !== undefined) return cfg.maxMinPerWeek;
     }
-  } catch (e) { /* fallback */ }
+  } catch (e) {}
   return 120;
 }
 
@@ -982,90 +901,66 @@ function showScreen(id) {
   });
   const target = document.getElementById(id);
   target.style.display = 'block';
-  // Trigger reflow before adding active class for animation
   void target.offsetWidth;
   target.classList.add('active');
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-function startQuestionnaire() {
-  currentItem = 0;
-  renderItem();
-  showScreen('screen-questionnaire');
-}
-
 // ═══════════════════════════════════════════════════════════════
-// QUESTIONNAIRE
+// PERSONA UI
 // ═══════════════════════════════════════════════════════════════
 
-function renderItem(direction) {
-  const item = ITEMS[currentItem];
-  const container = document.getElementById('items-container');
-
-  // Determine animation class
-  let animClass = '';
-  if (direction === 'forward') animClass = 'cardSlideIn';
-  else if (direction === 'back') animClass = 'slide-in-reverse';
-
-  container.innerHTML = `
-    <div class="q-card${answers[item.nr] ? ' answered' : ''}${animClass ? ' ' + animClass : ''}" id="card-${item.nr}">
-      <div class="q-number">Frage ${item.nr} / ${ITEMS.length}</div>
-      <div class="q-text">${item.text}</div>
-      <div class="likert-row">
-        ${[1,2,3,4,5].map(v => `
-          <button class="likert-btn ${answers[item.nr] === v ? 'selected' : ''}"
-                  onclick="selectAnswer(${item.nr}, ${v}, this)"
-                  type="button">
-            ${v}<span class="likert-label">${LIKERT_LABELS[v-1]}</span>
-          </button>
-        `).join('')}
-      </div>
-    </div>
-  `;
-
-  // Progress
-  const progress = ((currentItem + 1) / ITEMS.length) * 100;
-  document.getElementById('progress-fill').style.width = progress + '%';
-  document.getElementById('page-indicator').textContent =
-    `Frage ${currentItem + 1} von ${ITEMS.length}`;
-
-  // Back button
-  document.getElementById('btn-prev').style.visibility = currentItem === 0 ? 'hidden' : 'visible';
+function togglePersonaDesc() {
+  const toggle = document.getElementById('persona-toggle');
+  const desc = document.getElementById('persona-desc');
+  toggle.classList.toggle('open');
+  desc.classList.toggle('open');
+  const isOpen = desc.classList.contains('open');
+  toggle.querySelector('.chevron').nextSibling.textContent =
+    isOpen ? ' Beschreibung ausblenden' : ' Beschreibung anzeigen';
 }
 
-function selectAnswer(itemNr, value, btn) {
-  if (advancing) return;
-  answers[itemNr] = value;
-  const row = btn.parentElement;
-  row.querySelectorAll('.likert-btn').forEach(b => b.classList.remove('selected'));
-  btn.classList.add('selected');
-  const card = document.getElementById('card-' + itemNr);
-  card.classList.add('answered', 'advancing');
-
-  // Auto-advance after short delay
-  advancing = true;
-  setTimeout(() => {
-    advancing = false;
-    if (currentItem < ITEMS.length - 1) {
-      nextItem();
-    } else {
-      evaluate();
-    }
-  }, 400);
-}
-
-function nextItem() {
-  if (currentItem < ITEMS.length - 1) {
-    currentItem++;
-    renderItem('forward');
+function loadPersona() {
+  const params = new URLSearchParams(window.location.search);
+  const id = params.get('id') || 'sabine';
+  const persona = PERSONAS[id];
+  if (!persona) {
+    document.querySelector('.persona-card').innerHTML =
+      '<p style="color:var(--red);font-weight:600;">Persona nicht gefunden. Bitte verwenden Sie ?id=sabine, ?id=marco oder ?id=lena</p>';
+    return;
   }
-}
 
-function prevItem() {
-  if (currentItem > 0) {
-    currentItem--;
-    renderItem('back');
-  }
+  // Set page title
+  document.title = persona.name + ' – Persona-Ansicht';
+  document.getElementById('hero-subtitle').textContent =
+    'Beispielhaft ausgefüllte Bedarfserhebung – ' + persona.name;
+
+  // Avatar
+  const avatar = document.getElementById('persona-avatar');
+  avatar.textContent = persona.initial;
+  avatar.style.background = persona.avatarColor;
+
+  // Info
+  document.getElementById('persona-name').textContent = persona.name;
+  document.getElementById('persona-role').textContent = persona.role;
+  document.getElementById('persona-context').textContent = persona.context;
+
+  // Description
+  document.getElementById('persona-desc-text').textContent = persona.description;
+
+  // Steckbrief table
+  const table = document.getElementById('persona-steckbrief');
+  table.innerHTML = Object.entries(persona.steckbrief).map(([key, val]) =>
+    `<tr><td>${key}</td><td>${val}</td></tr>`
+  ).join('');
+
+  // Load answers
+  answers = { ...persona.answers };
+
+  // Compute and render results
+  const scores = computeScores();
+  renderRadar(scores);
+  renderAmpelTable(scores);
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -1084,13 +979,6 @@ function computeScores() {
   });
 }
 
-function evaluate() {
-  const scores = computeScores();
-  renderRadar(scores);
-  renderAmpelTable(scores);
-  showScreen('screen-results');
-}
-
 function renderRadar(scores) {
   const ctx = document.getElementById('radar-chart').getContext('2d');
   if (radarChart) radarChart.destroy();
@@ -1100,8 +988,6 @@ function renderRadar(scores) {
   const pointColors = scores.map(s =>
     s.level === 'green' ? '#2E7D32' : s.level === 'yellow' ? '#9C6500' : '#9C0006'
   );
-
-  // Build threshold lines (per cluster)
   const greenLine = scores.map(s => s.greenMin);
   const redLine = scores.map(s => s.redBelow);
 
@@ -1111,7 +997,7 @@ function renderRadar(scores) {
       labels,
       datasets: [
         {
-          label: 'Ihr Score',
+          label: 'Score',
           data,
           backgroundColor: 'rgba(46,64,87,0.12)',
           borderColor: '#2E4057',
@@ -1149,24 +1035,19 @@ function renderRadar(scores) {
       maintainAspectRatio: true,
       scales: {
         r: {
-          min: 1,
-          max: 5,
+          min: 1, max: 5,
           ticks: { stepSize: 1, backdropColor: 'transparent', font: { size: 11, family: 'Inter' } },
           grid: { color: 'rgba(0,0,0,0.06)' },
           angleLines: { color: 'rgba(0,0,0,0.06)' },
           pointLabels: { font: { size: 11, family: 'Inter', weight: '500' }, padding: 14 }
         }
       },
-      plugins: {
-        legend: { display: false }
-      }
+      plugins: { legend: { display: false } }
     }
   });
 
-  // Custom legend
-  const legendEl = document.getElementById('chart-legend');
-  legendEl.innerHTML = `
-    <div class="legend-item"><span class="legend-dot" style="background:#2E4057;"></span> Ihr Score</div>
+  document.getElementById('chart-legend').innerHTML = `
+    <div class="legend-item"><span class="legend-dot" style="background:#2E4057;"></span> Score</div>
     <div class="legend-item"><span class="legend-line" style="border-color:#2E7D32;"></span> Kein Bedarf</div>
     <div class="legend-item"><span class="legend-line" style="border-color:#9C0006;"></span> Hoher Bedarf</div>
   `;
@@ -1190,7 +1071,7 @@ function renderSummaryRadar(scores) {
       labels,
       datasets: [
         {
-          label: 'Ihr Score',
+          label: 'Score',
           data,
           backgroundColor: 'rgba(46,64,87,0.12)',
           borderColor: '#2E4057',
@@ -1228,23 +1109,19 @@ function renderSummaryRadar(scores) {
       maintainAspectRatio: true,
       scales: {
         r: {
-          min: 1,
-          max: 5,
+          min: 1, max: 5,
           ticks: { stepSize: 1, backdropColor: 'transparent', font: { size: 11, family: 'Inter' } },
           grid: { color: 'rgba(0,0,0,0.06)' },
           angleLines: { color: 'rgba(0,0,0,0.06)' },
           pointLabels: { font: { size: 11, family: 'Inter', weight: '500' }, padding: 14 }
         }
       },
-      plugins: {
-        legend: { display: false }
-      }
+      plugins: { legend: { display: false } }
     }
   });
 
-  const legendEl = document.getElementById('summary-chart-legend');
-  legendEl.innerHTML = `
-    <div class="legend-item"><span class="legend-dot" style="background:#2E4057;"></span> Ihr Score</div>
+  document.getElementById('summary-chart-legend').innerHTML = `
+    <div class="legend-item"><span class="legend-dot" style="background:#2E4057;"></span> Score</div>
     <div class="legend-item"><span class="legend-line" style="border-color:#2E7D32;"></span> Kein Bedarf</div>
     <div class="legend-item"><span class="legend-line" style="border-color:#9C0006;"></span> Hoher Bedarf</div>
   `;
@@ -1279,7 +1156,6 @@ function getFormatClass(format) {
 
 function showMassnahmenSelect() {
   const scores = computeScores();
-  // Filter: only yellow/red, sort red first then by lowest score
   const needClusters = scores
     .filter(s => s.level !== 'green')
     .sort((a, b) => {
@@ -1290,7 +1166,6 @@ function showMassnahmenSelect() {
 
   const container = document.getElementById('massnahmen-container');
 
-  // Edge case: 0 clusters with need
   if (needClusters.length === 0) {
     container.innerHTML = '<div class="no-measures">Alle Cluster liegen im grünen Bereich. Kein spezifisches Training erforderlich – weiter so!</div>';
     renderSummaryRadar(computeScores());
@@ -1298,7 +1173,6 @@ function showMassnahmenSelect() {
     return;
   }
 
-  // Filter out clusters with no active measures
   selectClusters = needClusters.filter(s => getActiveMassnahmen(s.id).length > 0);
   if (selectClusters.length === 0) {
     container.innerHTML = '<div class="no-measures">Alle Cluster liegen im grünen Bereich. Kein spezifisches Training erforderlich – weiter so!</div>';
@@ -1326,14 +1200,10 @@ function computeTimeUsed() {
   return total;
 }
 
-function getSelectedCount() {
-  return selectedMassnahmen.size;
-}
-
 function renderSelectScreen() {
   timeUsed = computeTimeUsed();
   const remaining = maxMinPerWeek - timeUsed;
-  const count = getSelectedCount();
+  const count = selectedMassnahmen.size;
   const pct = Math.min((timeUsed / maxMinPerWeek) * 100, 100);
 
   const redClusters = selectClusters.filter(s => s.level === 'red');
@@ -1399,7 +1269,6 @@ function renderClusterSelectGroup(cluster, remaining) {
       const isSelected = selectedMassnahmen.has(key);
       const wouldExceed = !isSelected && m.maxMin > remaining;
       const isDisabled = wouldExceed;
-
       const disabledReason = wouldExceed ? 'Zeitbudget überschritten' : '';
 
       return `
@@ -1441,15 +1310,13 @@ function showMassnahmenSummary() {
   const totalTime = computeTimeUsed();
   const totalCount = selectedMassnahmen.size;
 
-  // Group selected measures by cluster
-  const clusterSelections = {};  // { clusterId: [idx, idx, ...] }
+  const clusterSelections = {};
   for (const key of selectedMassnahmen) {
     const [cid, idx] = key.split('-').map(Number);
     if (!clusterSelections[cid]) clusterSelections[cid] = [];
     clusterSelections[cid].push(idx);
   }
 
-  // Build ordered list: red clusters first (by score asc), then yellow
   const chosenClusters = selectClusters
     .filter(s => clusterSelections[s.id] && clusterSelections[s.id].length > 0)
     .sort((a, b) => {
@@ -1522,20 +1389,10 @@ document.addEventListener('pointerdown', function(e) {
 });
 
 // ═══════════════════════════════════════════════════════════════
-// RESET
+// INIT
 // ═══════════════════════════════════════════════════════════════
 
-function resetApp() {
-  Object.keys(answers).forEach(k => delete answers[k]);
-  currentItem = 0;
-  advancing = false;
-  selectedMassnahmen = new Set();
-  selectClusters = [];
-  timeUsed = 0;
-  if (radarChart) { radarChart.destroy(); radarChart = null; }
-  if (summaryRadarChart) { summaryRadarChart.destroy(); summaryRadarChart = null; }
-  showScreen('screen-welcome');
-}
+loadPersona();
 </script>
 </body>
 </html>
