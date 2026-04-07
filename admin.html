@@ -476,12 +476,11 @@ body {
 // ═══════════════════════════════════════════════════════════════
 
 const CLUSTERS = [
-  { id: 1, name: "Achtsamkeit & Meditation" },
-  { id: 2, name: "Stressmanagement & Entspannung" },
-  { id: 3, name: "Gewohnheiten & Denkweisen" },
-  { id: 4, name: "Bewegung & körperliches Wohlbefinden" },
-  { id: 5, name: "Selbstmanagement & Problemlösung" },
-  { id: 6, name: "Emotionale & Positive Kompetenzen" }
+  { id: 1, name: "Präsenz" },
+  { id: 2, name: "Resilienz" },
+  { id: 3, name: "Psych. Flexibilität" },
+  { id: 4, name: "Bewegung" },
+  { id: 5, name: "Selbstmanagement" }
 ];
 
 const MASSNAHMEN = {
@@ -495,7 +494,8 @@ const MASSNAHMEN = {
     { title: "Digitale Stressmanagement-Programme", format: "Online", maxMin: 60 },
     { title: "Entspannungsinterventionen", format: "Mixed", maxMin: 30 },
     { title: "Stressmanagement-Kurzinterventionen", format: "Mixed", maxMin: 60 },
-    { title: "VR-gestützte Entspannung", format: "In-person", maxMin: 15 }
+    { title: "VR-gestützte Entspannung", format: "In-person", maxMin: 15 },
+    { title: "Positive Psychologie-Kurzinterventionen", format: "Online", maxMin: 15 }
   ],
   3: [
     { title: "KVT-basierte digitale Programme", format: "Online", maxMin: 60 },
@@ -509,9 +509,6 @@ const MASSNAHMEN = {
   5: [
     { title: "Digitale Selbsthilfe-Programme", format: "Online", maxMin: 60 },
     { title: "Internetbasiertes Problemlösetraining", format: "Online", maxMin: 60 }
-  ],
-  6: [
-    { title: "Positive Psychologie-Kurzinterventionen", format: "Online", maxMin: 15 }
   ]
 };
 
