@@ -774,72 +774,72 @@ const CLUSTERS = [
 const TAG_LABELS = {
   "RAUM": "Raum / Infrastruktur",
   "TR_EXT": "Externer Trainer",
-  "BOOSTER": "Booster-Sessions",
-  "VERTR.": "Vertraulichkeit",
   "LMS": "Lernplattform (LMS)",
   "VIDEO": "Videoinhalte",
   "ECOACH": "E-Coaching",
-  "APP": "App-Unterstützung"
+  "APP": "App-Unterstützung",
+  "NATUR": "Natur / Outdoor",
+  "BOOSTER": "Booster-Sessions"
 };
 
 const MASSNAHMEN = {
   1: [
     { title: "Betriebliche Achtsamkeitstrainings", format: "Mixed / In-person", maxMin: 150,
       desc: "Präsenzbasierte Gruppentrainings mit Achtsamkeitsübungen, Body-Scans und Meditation im betrieblichen Umfeld.",
-      tags: [{t:"RAUM",r:true},{t:"TR_EXT",r:true},{t:"BOOSTER",r:false},{t:"VERTR.",r:true}] },
+      tags: [{t:"RAUM",r:true},{t:"TR_EXT",r:true},{t:"APP",r:false},{t:"BOOSTER",r:false}] },
     { title: "Achtsamkeitsbasierte Stressreduktion (MBSR)", format: "Mixed", maxMin: 120,
       desc: "8-wöchiges strukturiertes Programm zur Stressreduktion durch Achtsamkeit nach Jon Kabat-Zinn.",
-      tags: [{t:"BOOSTER",r:false},{t:"VERTR.",r:true}] },
+      tags: [{t:"BOOSTER",r:false}] },
     { title: "Digitale Achtsamkeits- & Meditationsprogramme", format: "Online", maxMin: 40,
       desc: "Selbstgesteuertes Online-Training mit geführten Meditationen, Videos und App-gestützten Übungen.",
-      tags: [{t:"LMS",r:true},{t:"VIDEO",r:false},{t:"ECOACH",r:false},{t:"APP",r:false},{t:"BOOSTER",r:false},{t:"VERTR.",r:true}] },
+      tags: [{t:"LMS",r:true},{t:"ECOACH",r:false},{t:"APP",r:false},{t:"BOOSTER",r:false}] },
     { title: "Achtsamkeits-Kurzinterventionen", format: "Mixed", maxMin: 60,
       desc: "Kompakte Einheiten (ca. 10–15 Min.), integrierbar in den Arbeitsalltag.",
-      tags: [{t:"RAUM",r:true},{t:"TR_EXT",r:true},{t:"BOOSTER",r:false},{t:"VERTR.",r:true}] }
+      tags: [{t:"RAUM",r:true},{t:"TR_EXT",r:true},{t:"BOOSTER",r:false}] }
   ],
   2: [
     { title: "Digitale Stressmanagement-Programme", format: "Online", maxMin: 60,
       desc: "Online-Training zur Stressbewältigung mit Selbstlernmodulen und optionaler App-Begleitung.",
-      tags: [{t:"LMS",r:true},{t:"VIDEO",r:false},{t:"APP",r:false},{t:"BOOSTER",r:false},{t:"VERTR.",r:true}] },
+      tags: [{t:"LMS",r:true},{t:"ECOACH",r:false},{t:"APP",r:false},{t:"BOOSTER",r:false}] },
     { title: "Entspannungsinterventionen", format: "Mixed", maxMin: 30,
       desc: "Progressive Muskelrelaxation, Autogenes Training oder ähnliche Techniken in Gruppenform.",
-      tags: [{t:"RAUM",r:true},{t:"TR_EXT",r:true},{t:"BOOSTER",r:false},{t:"VERTR.",r:true}] },
+      tags: [{t:"RAUM",r:true},{t:"TR_EXT",r:true},{t:"BOOSTER",r:false}] },
     { title: "Stressmanagement-Kurzinterventionen", format: "Mixed", maxMin: 60,
       desc: "Kompakte Module, niederschwellig in den Arbeitsalltag integrierbar.",
-      tags: [{t:"BOOSTER",r:false},{t:"VERTR.",r:true}] },
+      tags: [{t:"BOOSTER",r:false}] },
     { title: "VR-gestützte Entspannung", format: "In-person", maxMin: 15,
       desc: "Entspannungstraining in Virtual-Reality-Umgebungen mit immersiven Naturszenarien.",
-      tags: [{t:"RAUM",r:true},{t:"TR_EXT",r:true},{t:"VIDEO",r:true},{t:"VERTR.",r:true}] },
+      tags: [{t:"RAUM",r:true},{t:"TR_EXT",r:true},{t:"BOOSTER",r:false}] },
     { title: "Positive Psychologie-Kurzinterventionen", format: "Online", maxMin: 15,
       desc: "Übungen zur Förderung positiver Emotionen, Dankbarkeit und Stärkenorientierung.",
-      tags: [{t:"LMS",r:true},{t:"VIDEO",r:false},{t:"APP",r:false},{t:"BOOSTER",r:false},{t:"VERTR.",r:true}] }
+      tags: [{t:"BOOSTER",r:false}] }
   ],
   3: [
     { title: "KVT-basierte digitale Programme", format: "Online", maxMin: 60,
       desc: "Kognitive Verhaltenstherapie als Online-Selbsthilfe zur Veränderung dysfunktionaler Denkmuster.",
-      tags: [{t:"LMS",r:true},{t:"VIDEO",r:false},{t:"ECOACH",r:false},{t:"APP",r:false},{t:"BOOSTER",r:false},{t:"VERTR.",r:true}] },
+      tags: [{t:"LMS",r:true},{t:"BOOSTER",r:false}] },
     { title: "ACT-basierte Online-Interventionen", format: "Online", maxMin: 75,
       desc: "Akzeptanz- und Commitment-Übungen zur Förderung psychologischer Flexibilität.",
-      tags: [{t:"LMS",r:true},{t:"VIDEO",r:false},{t:"ECOACH",r:false},{t:"APP",r:false},{t:"BOOSTER",r:false},{t:"VERTR.",r:true}] }
+      tags: [{t:"LMS",r:true},{t:"BOOSTER",r:false}] }
   ],
   4: [
     { title: "Betriebliche Bewegungsprogramme", format: "In-person Gruppe", maxMin: 90,
       desc: "Regelmässige Gruppenaktivitäten wie Laufgruppen, Firmenfitness oder aktive Pausen.",
-      tags: [{t:"RAUM",r:true},{t:"TR_EXT",r:true},{t:"APP",r:false},{t:"BOOSTER",r:false},{t:"VERTR.",r:true}] },
+      tags: [{t:"BOOSTER",r:false}] },
     { title: "Yoga-basierte Stressreduktion", format: "In-person Gruppe", maxMin: 60,
       desc: "Yoga-Einheiten mit Körperübungen, Atemtechniken und Entspannung.",
-      tags: [{t:"RAUM",r:true},{t:"TR_EXT",r:true},{t:"VIDEO",r:false},{t:"APP",r:false},{t:"BOOSTER",r:false},{t:"VERTR.",r:true}] },
+      tags: [{t:"RAUM",r:true},{t:"TR_EXT",r:true},{t:"APP",r:false},{t:"BOOSTER",r:false}] },
     { title: "Kompensatorische Bewegungsprogramme", format: "In-person Gruppe", maxMin: 30,
       desc: "Gezielte Übungen zum Ausgleich einseitiger Arbeitsbelastungen (z.B. langes Sitzen).",
-      tags: [{t:"RAUM",r:true},{t:"TR_EXT",r:true},{t:"APP",r:false},{t:"BOOSTER",r:false},{t:"VERTR.",r:true}] }
+      tags: [{t:"RAUM",r:true},{t:"TR_EXT",r:true},{t:"APP",r:false},{t:"BOOSTER",r:false}] }
   ],
   5: [
     { title: "Digitale Selbsthilfe-Programme", format: "Online", maxMin: 60,
       desc: "Online-Module zur Stärkung von Selbstmanagement und persönlicher Zielorientierung.",
-      tags: [{t:"LMS",r:true},{t:"VIDEO",r:false},{t:"APP",r:false},{t:"BOOSTER",r:false},{t:"VERTR.",r:true}] },
+      tags: [{t:"LMS",r:true},{t:"BOOSTER",r:false}] },
     { title: "Internetbasiertes Problemlösetraining", format: "Online", maxMin: 60,
       desc: "Strukturiertes Online-Training zur systematischen Lösung beruflicher Herausforderungen.",
-      tags: [{t:"LMS",r:true},{t:"VIDEO",r:false},{t:"ECOACH",r:false},{t:"APP",r:false},{t:"BOOSTER",r:false},{t:"VERTR.",r:true}] }
+      tags: [{t:"LMS",r:true},{t:"VIDEO",r:true},{t:"ECOACH",r:false},{t:"BOOSTER",r:false}] }
   ]
 };
 
